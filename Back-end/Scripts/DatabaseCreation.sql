@@ -1,7 +1,5 @@
 drop database if exists SEP;
-
 create database SEP;
-
 use SEP;
 
 create table if not exists Account(
@@ -35,6 +33,7 @@ OriginAccount varchar(100),
 DestinationAccount varchar(100),
 Causal varchar(100),
 Quantity float,
+GroupTransiction boolean,
 Data Date not null
 
 );
@@ -46,6 +45,7 @@ DestinationAccount varchar(100),
 IdTransaction int,
 Causal varchar(100),
 Quantity float,
+GroupTransiction boolean,
 OriginPermission boolean,
 
 primary key (OriginAccount, DestinationAccount, IdTransaction)
@@ -73,7 +73,6 @@ TemporalFrequency int
 
 );
 
-
 create table if not exists GroupPaymentAccounts(
 
 IdNumber int,
@@ -81,3 +80,11 @@ Account varchar(100)
 
 );
 
+create table if not exists InvitesGroupSuspended(
+
+IdNumber int,
+Account varchar(100),
+
+primary key (IdNumber, Account)
+
+);
