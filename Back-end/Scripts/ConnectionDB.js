@@ -18,13 +18,15 @@ class SQLConnection {
   }
 
   async GetQuery(query) {
-    const conn = await this.pool.getConnection();
-    try {
+    let conn;
+    try { conn = await this.pool.getConnection(); }
+    catch(e){ return undefined; }
+
+    try{
       const [rows, fields] = await conn.execute(query);
       return rows;
     } 
     catch(e){ return null; }
-
     finally { conn.release(); }
   }
 

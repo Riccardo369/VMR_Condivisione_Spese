@@ -5,7 +5,7 @@ const ManagementJWT = require("./ManagementJWT");
 
 
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
-const JWT = new ManagementJWT();
+const StoreJWT = new ManagementJWT();
 
 
 // Registra un gestore per l'evento di chiusura del server
@@ -22,7 +22,6 @@ fastify.register(async function (instance) {
 });
 
 
-  
 fastify.route({
 
     method: "POST",
@@ -37,15 +36,31 @@ fastify.route({
       //Controllare se esiste già l' account implica un maggior rischio di passare i dati nella rete
       //Se esiste ottengo un errore
       //Se non esiste viene creato
+      //L' hacker non è sicuro se la password è quella o no, perchè mi dà errore in base al Nickname
 
-      (async () => {
+      const rows = await DB.GetQuery("insert into account (Nickname, Password) values ('"+Nickname+"', '"+Password+"')");
 
-        const rows = await DB.GetQuery("insert into account (Nickname, Password) values ('"+Nickname+"', '"+Password+"')");
+      if(rows === undefined){
 
-        if(rows === null) console.log("L' account esiste già");
-        else console.log("Account creato con successo");
+        console.log("Problemi nella registrazione dell' account "+Nickname);
+        res.status(500);
+        res.send();
+        return;
 
-      })();
+      }
+
+      if(rows === null){
+        console.log("L' account "+Nickname+" esiste già");
+        res.status(403);
+      }
+
+      else{
+        console.log("Registrazione account "+Nickname+" effettuata");
+        res.status(200);
+      } 
+
+      res.send();
+      return;
 
     }
   
@@ -62,18 +77,40 @@ fastify.route({
     let Nickname = req.query["Nickname"];
     let Password = req.query["Password"];
 
-    //Se esiste ottengo la conferma
-    //Se non esiste viene creato
+    //Controllare se esiste già l' account implica un maggior rischio di passare i dati nella rete
+    //Se esiste ottengo una query con una riga
+    //Se non esiste ottengo una query vuota
 
-    (async () => {
+    const rows = await DB.GetQuery("select Nickname from Account where Nickname = '"+Nickname+"' and Password = '"+Password+"'");
 
-      const rows = await DB.GetQuery("select Nickname from Account where Nickname = '"+Nickname+"' and Password = '"+Password+"'");
+    if(rows === undefined){
+      console.log("Problemi nell' autenticazione dell' account "+Nickname);
+      res.status(500);
+      res.send();
+      return;
+    }
 
-      if(rows.length === 0) console.log("Credenziali non valide");
-      else console.log("Benvenuto "+Nickname);
-      
-    })();
-        
+    if(rows.length === 0){
+      console.log("Credenziali non valide");
+      res.status(401);
+    }
+
+    else{
+
+      await StoreJWT.AddJWT(Nickname);
+
+      let TokenJWT = await StoreJWT.GetJWTFromAccount(Nickname);
+
+      res.header('Authorization', TokenJWT);
+      res.status(200);
+
+      console.log("Token rilasciato: "+res.getHeader("Authorization"));
+      console.log("Ben tornato "+Nickname);
+    }
+
+    res.send();
+    return;
+
   }
 
 });
@@ -84,32 +121,79 @@ fastify.route({
   path: "/account",
   handler: async (req, res) => {
 
-    console.log("DELETE/account");
+  console.log("DELETE/account");
 
-    let Nickname = req.query["Nickname"];
-    let Password = req.query["Password"];
+  let Nickname = await StoreJWT.GetAccountFromJWT(req.headers["authorization"]);
+  let Password = req.query["Password"];
 
-    //Controllare se esiste già l' account implica un maggior rischio di passare i dati nella rete
-    //Se esiste viene cancellato
-    //Se non esiste non viene cancellato
-    //Se l' hacker a già la password non puoi saperlo da questa API
-
-    (async () => {
-
-      const rows = await DB.GetQuery("delete from account where Nickname = '"+Nickname+"' and Password = '"+Password+"'");
-
-      if(rows === null) console.log("Credenziali non valide");
-      else console.log("Account cancellato "+Nickname);
-      
-    })();
+  if(Nickname === null){
+    console.log("JWT non valido");
+    res.status(401).send();
+    return;
   }
+
+  //Controllare se esiste già l' account implica un maggior rischio di passare i dati nella rete
+  //Se esiste viene cancellato
+  //Se non esiste non viene cancellato
+  //Se l' hacker ha già la password non puoi saperlo da questa API (deve avere anche il suo JWT)
+
+
+  //Qui bisogna controllare se la password è corretta
+
+  //Qui faccio una richiesta perchè, se la password non è quella, l' hacker sa solo che la password che lui stesso ha messo
+  //non è quella corretta.
+  //Se invece la password è quella corretta, l' account tanto verrà eliminato, ma se è l' hacker a fare questo,
+  //la sapeva già, sicuramente non l ha scoperta da questa API
+
+
+
+  let Response = await DB.GetQuery("select Nickname from account where Nickname = '"+Nickname+"' and Password = '"+Password+"'");
+
+  if(Response === undefined){
+
+    console.log("Problemi nell' eliminazione del tuo account "+Nickname);
+    res.status(500);
+    res.send();
+    return;
+
+  }
+
+  else if(Response.length === 0){
+    res.status(401);
+    res.send();
+    return;
+  }
+  
+
+
+  let rows;
+
+  try{
+    rows = await DB.GetQuery("delete from account where Nickname = '"+Nickname+"' and Password = '"+Password+"'");
+  }
+
+  //Nel caso in cui ci fossero problemi con il collegamento al DB
+  catch(e){
+    res.status(500);
+    console.log("Problemi nell' eliminazione del tuo account");
+  }
+
+  console.log("Account cancellato "+Nickname);
+  await StoreJWT.RemoveJWT(req.headers["authorization"]);
+
+  res.status(200);
+  res.send();
+
+  return;
+
+}
 
 });
 
 
 
 
-fastify.listen({ port: 3000, addr: "127.0.0.1" }, function (err, addr) {
+fastify.listen({ port: 3000 }, function (err, addr) {
     if (err) console.error("Errore, il server non parte: " + err);
     else console.log("Server in ascolto su " + addr);
     
