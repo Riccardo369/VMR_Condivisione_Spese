@@ -1,12 +1,16 @@
+//Librerie
 const fastify = require('fastify')();
-
+const fs = require("fs");
+//const path = require('path');
+//const fastifyStatic = require('fastify-static');
 const SQLConnection = require("./ConnectionDB");
 const ManagementJWT = require("./ManagementJWT");
+const ExtraAuthorization = require("./ExtraAuthorization");
 
-
+//Oggetti SINGLETON
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
 const StoreJWT = new ManagementJWT();
-
+const StoreTelephoneAuthorization = new ExtraAuthorization.TelephoneAuthorization();
 
 // Registra un gestore per l'evento di chiusura del server
 fastify.register(async function (instance) {
@@ -23,6 +27,23 @@ fastify.register(async function (instance) {
 
 
 fastify.route({
+  method: "GET",
+  path: "/",
+  handler: async (req, res) => {
+
+    console.log("GET/");
+
+    try {
+
+      const html = await fs.promises.readFile("../../Front-end/Client.html");
+      res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
+
+    } catch (error) { res.code(500).send("Internal Server Error"); }
+
+  }
+});
+
+fastify.route({
 
     method: "POST",
     path: "/register",
@@ -30,15 +51,22 @@ fastify.route({
 
       console.log("POST/register");
 
-      let Nickname = req.query["Nickname"];
-      let Password = req.query["Password"];
+      let Parameters = JSON.parse(req.body);
+
+      let FirstName = Parameters["FirstName"];
+      let LastName = Parameters["LastName"];
+      let Nickname = Parameters["Nickname"];
+      let TelephoneNumber = Parameters["TelephoneNumber"];
+      let Email = Parameters["Email"];
+      let Password = Parameters["Password"];
 
       //Controllare se esiste già l' account implica un maggior rischio di passare i dati nella rete
       //Se esiste ottengo un errore
       //Se non esiste viene creato
       //L' hacker non è sicuro se la password è quella o no, perchè mi dà errore in base al Nickname
 
-      const rows = await DB.GetQuery("insert into account (Nickname, Password) values ('"+Nickname+"', '"+Password+"')");
+      const rows = await DB.GetQuery("insert into account (FirstName, LastName, Nickname, TelephoneNumber, Email, Password, MoneyStack, ActualCreditCard) values (?, ?, ?, ?, ?, ?, 0.0, 0)",
+      [FirstName, LastName, Nickname, TelephoneNumber, Email, Password]);
 
       if(rows === undefined){
 
@@ -74,14 +102,16 @@ fastify.route({
 
     console.log("POST/login");
 
-    let Nickname = req.query["Nickname"];
-    let Password = req.query["Password"];
+    let Parameters = JSON.parse(req.body);
+
+    let Nickname = Parameters["Nickname"];
+    let Password = Parameters["Password"];
 
     //Controllare se esiste già l' account implica un maggior rischio di passare i dati nella rete
     //Se esiste ottengo una query con una riga
     //Se non esiste ottengo una query vuota
 
-    const rows = await DB.GetQuery("select Nickname from Account where Nickname = '"+Nickname+"' and Password = '"+Password+"'");
+    const rows = await DB.GetQuery("select Nickname from Account where Nickname = ? and Password = ?", [Nickname, Password]);
 
     if(rows === undefined){
       console.log("Problemi nell' autenticazione dell' account "+Nickname);
@@ -123,8 +153,11 @@ fastify.route({
 
   console.log("DELETE/account");
 
+  let Parameters = JSON.parse(req.body);
+
   let Nickname = await StoreJWT.GetAccountFromJWT(req.headers["authorization"]);
-  let Password = req.query["Password"];
+  let Password = Parameters["Password"];
+  
 
   if(Nickname === null){
     console.log("JWT non valido");
@@ -146,8 +179,7 @@ fastify.route({
   //la sapeva già, sicuramente non l ha scoperta da questa API
 
 
-
-  let Response = await DB.GetQuery("select Nickname from account where Nickname = '"+Nickname+"' and Password = '"+Password+"'");
+  let Response = await DB.GetQuery("select Nickname from account where Nickname = ? and Password = ?", [Nickname, Password]);
 
   if(Response === undefined){
 
@@ -169,7 +201,7 @@ fastify.route({
   let rows;
 
   try{
-    rows = await DB.GetQuery("delete from account where Nickname = '"+Nickname+"' and Password = '"+Password+"'");
+    rows = await DB.GetQuery("delete from account where Nickname = ? and Password = ?", [Nickname, Password]);
   }
 
   //Nel caso in cui ci fossero problemi con il collegamento al DB

@@ -82,8 +82,6 @@ async function CreateJWT(Nickname){
   //return jwt.sign({nickname: Nickname}, 'SEP_JWT_PASSWORD', {expiresIn: "30m"});
 
   return jwt.sign({nickname: Nickname}, "SEP_JWT_PASSWORD", {expiresIn: "30m"});
-
-  jwt.sign()
   
 }
 

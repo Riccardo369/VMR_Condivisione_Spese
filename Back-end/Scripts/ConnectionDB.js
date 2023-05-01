@@ -17,13 +17,13 @@ class SQLConnection {
     this.pool = mysql.createPool(this.config);
   }
 
-  async GetQuery(query) {
+  async GetQuery(query, parameters) {
     let conn;
     try { conn = await this.pool.getConnection(); }
     catch(e){ return undefined; }
 
     try{
-      const [rows, fields] = await conn.execute(query);
+      const [rows, fields] = await conn.execute(query, parameters);
       return rows;
     } 
     catch(e){ return null; }
