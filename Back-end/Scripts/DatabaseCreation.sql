@@ -4,6 +4,8 @@ use SEP;
 
 create table if not exists Account(
 
+FirstName varchar(100),
+LastName varchar(100),
 Nickname varchar(100) primary key,
 TelephoneNumber int(10),
 Email varchar(100),
