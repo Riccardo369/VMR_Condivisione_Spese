@@ -32,20 +32,20 @@
 
          <p style="text-align: center;">
 
-            <a href="index.html" >
-            <button onclick=""> Conferma </button>
-        
-            </a>
-    
+            <button onclick="RequestLogin()"> Conferma </button>
+
            </p>
 
            <script>
 
             function RequestLogin() {
-                
+
+                let HostServer = "192.168.31.54";
+                let PortServer = 3000;
+
                 const data = {
-                    Nickname: document.getElementById("Nickname").value,
-                    Password: document.getElementById("Password").value
+                    "Nickname": document.getElementById("Nickname").value,
+                    "Password": document.getElementById("Password").value
                 };
     
                 fetch("http://"+HostServer+":"+PortServer+"/login", {
@@ -58,11 +58,12 @@
                 .then(response => response.json())
                 .then(data => {
                     //gestisci la risposta del server qui
-                    console.log(data);
+                    //console.log(data);
                 })
                 .catch((error) => {
+                    //console.log("ERRORE OLè");
                     //gestisci gli errori qui
-                    console.error('Errore:', error);
+                    //console.error('Errore:', error);
                 });
             }
 

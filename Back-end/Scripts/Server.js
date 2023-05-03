@@ -166,7 +166,11 @@ fastify.route({
 
     console.log("POST/login");
 
+    console.log(req.body);
+
     let Parameters = JSON.parse(req.body);
+
+    console.log(Parameters);
 
     let Nickname = Parameters["Nickname"];
     let Password = Parameters["Password"];
