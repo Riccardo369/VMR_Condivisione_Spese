@@ -1,8 +1,6 @@
 //Librerie
 const fastify = require('fastify')();
 const fs = require("fs");
-//const path = require('path');
-//const fastifyStatic = require('fastify-static');
 const SQLConnection = require("./ConnectionDB");
 const ManagementJWT = require("./ManagementJWT");
 const ExtraAuthorization = require("./ExtraAuthorization");
@@ -11,6 +9,15 @@ const ExtraAuthorization = require("./ExtraAuthorization");
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
 const StoreJWT = new ManagementJWT();
 const StoreTelephoneAuthorization = new ExtraAuthorization.TelephoneAuthorization();
+
+const fastifyCors = require('fastify-cors');
+
+fastify.register(fastifyCors, {
+  origin: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type'],
+  credentials: true
+});
 
 // Registra un gestore per l'evento di chiusura del server
 fastify.register(async function (instance) {
@@ -25,6 +32,29 @@ fastify.register(async function (instance) {
     });
 });
 
+fastify.route({
+
+  method: "GET",
+  path: "/RequestResource",
+  handler: async (req, res) => {
+
+    console.log("GET/RequestResource");
+
+    let Parameters = JSON.parse(req.body);
+
+    let Resource = Parameters["HTML"];
+
+    try {
+
+      const html = await fs.promises.readFile("../../Front-end/"+Resource+".html");
+      res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
+
+    } catch (error) { res.code(500).send("Internal Server Error"); }
+
+  }
+
+});
+
 
 fastify.route({
   method: "GET",
@@ -36,6 +66,40 @@ fastify.route({
     try {
 
       const html = await fs.promises.readFile("../../Front-end/Client.html");
+      res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
+
+    } catch (error) { res.code(500).send("Internal Server Error"); }
+
+  }
+});
+
+fastify.route({
+  method: "GET",
+  path: "/Accedi.html",
+  handler: async (req, res) => {
+
+    console.log("GET/");
+
+    try {
+
+      const html = await fs.promises.readFile("../../Front-end/Accedi.html");
+      res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
+
+    } catch (error) { res.code(500).send("Internal Server Error"); }
+
+  }
+});
+
+fastify.route({
+  method: "GET",
+  path: "/Registrazione-1.html",
+  handler: async (req, res) => {
+
+    console.log("GET/");
+
+    try {
+
+      const html = await fs.promises.readFile("../../Front-end/Registrazione.html");
       res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
 
     } catch (error) { res.code(500).send("Internal Server Error"); }
@@ -196,8 +260,6 @@ fastify.route({
     return;
   }
   
-
-
   let rows;
 
   try{
@@ -223,9 +285,7 @@ fastify.route({
 });
 
 
-
-
-fastify.listen({ port: 3000 }, function (err, addr) {
+fastify.listen({ port: 3000, host: "192.168.31.54" }, function (err, addr) {
     if (err) console.error("Errore, il server non parte: " + err);
     else console.log("Server in ascolto su " + addr);
     
