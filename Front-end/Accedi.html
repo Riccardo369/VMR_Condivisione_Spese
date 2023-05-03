@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src = "Events.js"></script>
     <fieldset style="border: 2px double rgb(0, 51, 128)">
         <legend style="color:blueviolet; font-family: papyrus;">
         <strong>SEP</strong>
-    </legend> 
-    <script src = "AccediEvents.js"></script>
+    </legend>
         </head>
     <body bgcolor="#B0C4DE">
         <h3>
@@ -15,7 +15,7 @@
             <div>
             <p style="text-align:center;">
         Inserisci nickname:
-        <input type="text" placeholder="Nickname"> 
+        <input type="text" placeholder="Nickname", id = "Nickname"> 
             </p>
             </div>
 
@@ -24,7 +24,7 @@
             <div>
         <p style="text-align: center;">
         Inserisci password:
-        <input type="password" placeholder="Inserisci password">
+        <input type="password" placeholder="Inserisci password", id ="Password">
          </p>
          </div>
 
@@ -33,10 +33,40 @@
          <p style="text-align: center;">
 
             <a href="index.html" >
-                <button> Conferma </button> 
-           </a>
+            <button onclick=""> Conferma </button>
+        
+            </a>
     
            </p>
+
+           <script>
+
+            function RequestLogin() {
+                
+                const data = {
+                    Nickname: document.getElementById("Nickname").value,
+                    Password: document.getElementById("Password").value
+                };
+    
+                fetch("http://"+HostServer+":"+PortServer+"/login", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    //gestisci la risposta del server qui
+                    console.log(data);
+                })
+                .catch((error) => {
+                    //gestisci gli errori qui
+                    console.error('Errore:', error);
+                });
+            }
+
+        </script>
     </body>
 </fieldset>
 </html>
