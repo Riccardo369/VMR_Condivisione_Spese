@@ -4,6 +4,40 @@ async function RandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+class RealAccountAuthorization{
+
+  /*La struttura di questa lista è:
+  1) Nickname account
+  2) Lista di password tentate
+  3) TimeStamp di azzeramento
+  4) Tentativi rimasti
+
+  5) this.Dict[Nickname] = {Lista di password, TimeStamp}
+
+  */
+
+  Dict;
+
+  Tentativi = 10;
+
+  SecondiAzzeramento = 10*60;
+
+  constructor(){
+
+    this.Dict = {};
+
+  }
+
+  AddPassword(Nickname, Password){
+    if(this.Dict[Nickname] === undefined){
+
+    }
+  }
+
+
+
+}
+
 class AuthorizationCode{
 
   Dict;

@@ -4,6 +4,7 @@ const fs = require("fs");
 const SQLConnection = require("./ConnectionDB");
 const ManagementJWT = require("./ManagementJWT");
 const ExtraAuthorization = require("./ExtraAuthorization");
+const Security = require("./Security");
 
 //Oggetti SINGLETON
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
@@ -11,6 +12,7 @@ const StoreJWT = new ManagementJWT();
 const StoreTelephoneAuthorization = new ExtraAuthorization.TelephoneAuthorization();
 
 const fastifyCors = require('fastify-cors');
+const CryptingText = require('./Security');
 
 fastify.register(fastifyCors, {
   origin: true,
@@ -78,7 +80,7 @@ fastify.route({
   path: "/Accedi.html",
   handler: async (req, res) => {
 
-    console.log("GET/");
+    console.log("GET/Accedi.html");
 
     try {
 
@@ -95,16 +97,43 @@ fastify.route({
   path: "/Registrazione-1.html",
   handler: async (req, res) => {
 
-    console.log("GET/");
+    console.log("GET/Registrazione-1.html");
 
     try {
 
-      const html = await fs.promises.readFile("../../Front-end/Registrazione.html");
+      const html = await fs.promises.readFile("../../Front-end/Registrazione-1.html");
       res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
 
     } catch (error) { res.code(500).send("Internal Server Error"); }
 
   }
+});
+
+fastify.route({
+
+  method: "POST",
+  path: "/ConfirmTelephoneCode",
+  handler: async (req, res) => {
+
+    let Parameters = JSON.parse(req.body);
+
+    let Number = Parameters["Number"];
+    let Code = Parameters["Code"];
+
+    if(StoreTelephoneAuthorization.ConfirmBlock(Number, Code)) res.status(200).send();
+
+    else{
+
+      //Se si è riusciti ad inviare il nuovo SMS
+      if(StoreTelephoneAuthorization.AddBlock(Number)) res.status(401).send();
+
+      //Altrimenti
+      else res.status(401).send("Nuovo SMS non inviato");
+
+    }
+    
+  }
+
 });
 
 fastify.route({
@@ -115,14 +144,33 @@ fastify.route({
 
       console.log("POST/register");
 
-      let Parameters = JSON.parse(req.body);
+      let FirstName;
+      let LastName;
+      let Nickname;
+      let TelephoneNumber;
+      let Email;
+      let Password;
 
-      let FirstName = Parameters["FirstName"];
-      let LastName = Parameters["LastName"];
-      let Nickname = Parameters["Nickname"];
-      let TelephoneNumber = Parameters["TelephoneNumber"];
-      let Email = Parameters["Email"];
-      let Password = Parameters["Password"];
+      try{
+
+        FirstName = req.body["FirstName"];
+        LastName = req.body["LastName"];
+        Nickname = req.body["Nickname"];
+        TelephoneNumber = req.body["TelephoneNumber"];
+        Email = req.body["Email"];
+        Password = req.body["Password"];
+
+        console.log(Password);
+
+      }
+      catch(e){
+
+        console.log("I dati non sono stati passati nel modo corretto");
+        res.status(400);
+        res.send();
+        return;
+
+      }
 
       //Controllare se esiste già l' account implica un maggior rischio di passare i dati nella rete
       //Se esiste ottengo un errore
@@ -166,14 +214,23 @@ fastify.route({
 
     console.log("POST/login");
 
-    console.log(req.body);
+    let Nickname;
+    let Password;
 
-    let Parameters = JSON.parse(req.body);
+    try{
 
-    console.log(Parameters);
+      Nickname = req.body["Nickname"];
+      Password = await CryptingTextSALT(req.body["Password"]);
 
-    let Nickname = Parameters["Nickname"];
-    let Password = Parameters["Password"];
+    }
+    catch(e){
+
+      console.log("I dati non sono stati passati nel modo corretto");
+      res.status(400);
+      res.send();
+      return;
+
+    }
 
     //Controllare se esiste già l' account implica un maggior rischio di passare i dati nella rete
     //Se esiste ottengo una query con una riga
@@ -221,10 +278,20 @@ fastify.route({
 
   console.log("DELETE/account");
 
-  let Parameters = JSON.parse(req.body);
+  try{
 
-  let Nickname = await StoreJWT.GetAccountFromJWT(req.headers["authorization"]);
-  let Password = Parameters["Password"];
+    let Nickname = await StoreJWT.GetAccountFromJWT(req.headers["authorization"]);
+    let Password = await CryptingTextSALT(req.body["Password"]);
+
+  }
+  catch(e){
+
+    console.log("I dati non sono stati passati nel modo corretto");
+    res.status(400);
+    res.send();
+    return;
+
+  }
   
 
   if(Nickname === null){
