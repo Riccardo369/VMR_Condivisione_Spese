@@ -12,12 +12,7 @@ class ManagementJWT {
 
   }
 
-<<<<<<< Updated upstream
-  async AddJWT(Nickname){   //Fatto
-=======
   async AddJWT(Nickname){
->>>>>>> Stashed changes
-
     let JWT = await CreateJWT(Nickname);
 
     this.JWT_Account[JWT] = Nickname;

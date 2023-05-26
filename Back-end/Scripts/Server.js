@@ -8,25 +8,31 @@ const fs = require("fs");
 const SQLConnection = require("./ConnectionDB");
 const ManagementJWT = require("./ManagementJWT");
 const ExtraAuthorization = require("./ExtraAuthorization");
-const Security = require("./Security");
+const Security = require("./CryptingSecurity");
 const fastifyCors = require('fastify-cors');
 
 //Oggetti SINGLETON
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
 const StoreJWT = new ManagementJWT();
+const ManagementSALT = new Security.UserSALT();
 
 
 const SettingsCORS = {
 
   origin: function(origin, callback){
 
+    console.log("Origin request: "+origin);
+
     //Liste degl' indirizzi permessi. In ogni lista c' è, l' indirizzo e tutte le porte ammissibili.
     //Primo elemento = indirizzo
     //Secondo elemento = tutte le porte con quell' indirizzo (nel caso in cui c'è '*' tutte le porte sono ammesse)
     let AllowOrigin = [
         ["localhost", "*"],
+        ["127.0.0.2", "*"],
         ["134.35.6.9", [20, 3000]]
     ];
+
+    
 
     //Nel caso in cui nessun indirizzo è permesso
     if(AllowOrigin === null) return callback(null, false);

@@ -47,8 +47,16 @@
                     "Nickname": ""+document.getElementById("Nickname").value+"",
                     "Password": ""+document.getElementById("Password").value+""
                 };
+
+                var xhttp = new XMLHttpRequest();
+
+                xhttp.open("POST", "http://"+HostServer+":"+PortServer+"/login", true);
+                xhttp.setRequestHeader("Content-type", "application/json");
+                //xhttp.withCredentials = true;
+                
+                xhttp.send(JSON.stringify(data));
     
-                fetch("http://"+HostServer+":"+PortServer+"/login", {
+                /*fetch("http://"+HostServer+":"+PortServer+"/login", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -63,7 +71,7 @@
                     //console.log("ERRORE OLè");
                     //gestisci gli errori qui
                     console.error('Errore:', error);
-                });
+                });*/
             }
 
         </script>
