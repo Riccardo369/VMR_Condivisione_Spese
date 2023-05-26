@@ -14,12 +14,52 @@ const StoreTelephoneAuthorization = new ExtraAuthorization.TelephoneAuthorizatio
 const fastifyCors = require('fastify-cors');
 const CryptingText = require('./Security');
 
-fastify.register(fastifyCors, {
-  origin: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
-  credentials: true
-});
+const SettingsCORS = {
+
+  origin: function(origin, callback){
+
+    //Liste degl' indirizzi permessi. In ogni lista c' è, l' indirizzo e tutte le porte ammissibili.
+    //Primo elemento = indirizzo
+    //Secondo elemento = tutte le porte con quell' indirizzo (nel caso in cui c'è '*' tutte le porte sono ammesse)
+    let AllowOrigin = [
+        ["localhost", "*"],
+        ["134.35.6.9", [20, 3000]]
+    ];
+
+    //Nel caso in cui nessun indirizzo è permesso
+    if(AllowOrigin === null) return callback(null, false);
+
+    //Nel caso in cui tutti gl' indirizzi sono permessi
+    if(AllowOrigin === "*") return callback(null, true);
+
+    //Se l' indirizzo permesso è stato trovato
+    for(let i=0; i<AllowOrigin.length; i++){
+
+        //Se tutte le porte sono valide per questo indirizzo
+        if(AllowOrigin[i][1] === "*"){
+            if(AllowOrigin[i][0] === origin.slice(7, AllowOrigin[i][0].length+7)) return callback(null, true);
+            continue;
+        }
+
+        //Se ci sono porte specifiche permesse per questo indirizzo
+        for(let r=0; r<AllowOrigin[i].length; r++){
+            if(origin === "http://"+AllowOrigin[i][0]+":"+AllowOrigin[i][1][r]) return callback(null, true);   
+        }
+
+    } 
+
+    //Nel caso in cui non ho trovato nessun indirizzo tra quelli consentiti
+    return callback(null, false);
+  },
+
+"methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+"preflightContinue": false,
+"credentials": true,
+"optionsSuccessStatus": 204
+
+}
+
+fastify.register(fastifyCors, SettingsCORS);
 
 // Registra un gestore per l'evento di chiusura del server
 fastify.register(async function (instance) {
