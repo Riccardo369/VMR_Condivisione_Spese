@@ -5,14 +5,13 @@ const SQLConnection = require("./ConnectionDB");
 const ManagementJWT = require("./ManagementJWT");
 const ExtraAuthorization = require("./ExtraAuthorization");
 const Security = require("./Security");
+const fastifyCors = require('fastify-cors');
+const ManagementSALT = require('./ManagementSALT');
 
 //Oggetti SINGLETON
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
 const StoreJWT = new ManagementJWT();
-const StoreTelephoneAuthorization = new ExtraAuthorization.TelephoneAuthorization();
 
-const fastifyCors = require('fastify-cors');
-const CryptingText = require('./Security');
 
 const SettingsCORS = {
 

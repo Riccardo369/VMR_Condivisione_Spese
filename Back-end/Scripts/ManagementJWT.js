@@ -12,7 +12,6 @@ class ManagementJWT {
 
   }
 
-
   async AddJWT(Nickname){   //Fatto
 
     let JWT = await CreateJWT(Nickname);
@@ -24,8 +23,8 @@ class ManagementJWT {
 
   async RemoveJWT(JWT){    //Fatto
 
-    delete this.Account_JWT[JWT_Account[JWT]];
-    delete this.Dict[JWT];
+    delete this.Account_JWT[this.JWT_Account[JWT]];
+    delete this.JWT_Account[JWT];
     
   }
 
