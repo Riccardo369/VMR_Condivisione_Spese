@@ -1,0 +1,7 @@
+{
+  "name": "progettoIonic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
