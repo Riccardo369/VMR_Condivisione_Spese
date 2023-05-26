@@ -22,7 +22,13 @@ class SQLConnection {
     try { conn = await this.pool.getConnection(); }
     catch(e){ return undefined; }
 
+    
+
     try{
+
+      //Ulteriore protezione contro la SQL injection
+      //for(let i=0; i<parameters.length; i++) if(parameters[i].includes(" ")) throw new Error;
+      
       const [rows, fields] = await conn.execute(query, parameters);
       return rows;
     } 

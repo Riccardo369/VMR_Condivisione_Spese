@@ -12,7 +12,11 @@ class ManagementJWT {
 
   }
 
+<<<<<<< Updated upstream
   async AddJWT(Nickname){   //Fatto
+=======
+  async AddJWT(Nickname){
+>>>>>>> Stashed changes
 
     let JWT = await CreateJWT(Nickname);
 
@@ -21,14 +25,14 @@ class ManagementJWT {
 
   }
 
-  async RemoveJWT(JWT){    //Fatto
+  async RemoveJWT(JWT){
 
     delete this.Account_JWT[this.JWT_Account[JWT]];
     delete this.JWT_Account[JWT];
     
   }
 
-  async GetJWTFromAccount(Account){     //Fatto
+  async GetJWTFromAccount(Account){
 
     try{
 
@@ -51,14 +55,12 @@ class ManagementJWT {
 
   }
 
-  async GetAccountFromJWT(JWT){   //Fatto
+  async GetAccountFromJWT(JWT){
 
     try{
 
       //Controllo che il JWT non è scaduto
       let ExpiredJWT = await this.IsExpiredJWT(JWT);
-
-      console.log(ExpiredJWT);
 
       if(ExpiredJWT) return null;
 
@@ -78,7 +80,7 @@ class ManagementJWT {
   }
 
   //Cancello in modo automatico i JWT scaduti
-  async DeleteExpiredJWT(){  //Fatto
+  async DeleteExpiredJWT(){
 
     for (let JWT in this.JWT_Account) {
         if(this.IsExpiredJWT(JWT)) {
@@ -92,7 +94,7 @@ class ManagementJWT {
   }
 
   //Funzione che ridà la condizione che il token sia ancora valido o no
-  async IsExpiredJWT(JWT){    //Fatto
+  async IsExpiredJWT(JWT){
 
     //Ottengo il TimeStamp attuale
     let TimeNow = new Date().getTime(); 
@@ -107,27 +109,23 @@ class ManagementJWT {
 
 }
 
-function GenerateRandomString(length) {  //Fatto
-  let result = '';
+async function GenerateRandomString(length) {
+  
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
 
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
+    for (let i = 0; i < length; i++) result += characters.charAt(Math.random() * characters.length);
 
-  return result;
+    return result;
 }
 
-async function CreateJWT(Nickname){  //Fatto
-
-  //return jwt.sign({email: Email, password: Password}, 'mySecretKey', {expiresIn: "30m"});
+async function CreateJWT(Nickname){
 
   //I parametri inseriti in ordine sono: i dati, la stringa che forma la chiave e le opzioni
   //return jwt.sign({nickname: Nickname}, *Password casuale*, {expiresIn: "30m"});
 
-  return jwt.sign({nickname: Nickname}, GenerateRandomString(20), {expiresIn: "30m"});
+  return jwt.sign({nickname: Nickname}, (await GenerateRandomString(20)), {expiresIn: "30m"});
   
 }
-
 
 module.exports = ManagementJWT;
