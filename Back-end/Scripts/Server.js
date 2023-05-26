@@ -7,21 +7,13 @@ const fs = require("fs");
 //Librerie personali
 const SQLConnection = require("./ConnectionDB");
 const ManagementJWT = require("./ManagementJWT");
-<<<<<<< Updated upstream
 const ExtraAuthorization = require("./ExtraAuthorization");
 const Security = require("./Security");
 const fastifyCors = require('fastify-cors');
-const ManagementSALT = require('./ManagementSALT');
-=======
-const CryptingSecurity = require("./CryptingSecurity");
-const TimeProtection = require("./TimeProtection");
-const BruteforceBlocks = require('./TimeProtection');
->>>>>>> Stashed changes
 
 //Oggetti SINGLETON
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
 const StoreJWT = new ManagementJWT();
-<<<<<<< Updated upstream
 
 
 const SettingsCORS = {
@@ -70,16 +62,6 @@ const SettingsCORS = {
 }
 
 fastify.register(fastifyCors, SettingsCORS);
-=======
-const ManagementSALT = new CryptingSecurity.UserSALT();
-const BruteforceManagement = new BruteforceBlocks();
-
-
-fastify.register(CORS, {
-  origin: "123.4.5.6",
-  methods: ['GET', 'POST', 'PUT', 'DELETE']
-});
->>>>>>> Stashed changes
 
 // Registra un gestore per l'evento di chiusura del server
 fastify.register(async function (instance) {
