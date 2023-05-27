@@ -23,6 +23,8 @@ const SettingsCORS = {
 
     console.log("Origin request: "+origin);
 
+    if(origin === undefined) return callback(null, true);
+
     //Liste degl' indirizzi permessi. In ogni lista c' è, l' indirizzo e tutte le porte ammissibili.
     //Primo elemento = indirizzo
     //Secondo elemento = tutte le porte con quell' indirizzo (nel caso in cui c'è '*' tutte le porte sono ammesse)
@@ -31,8 +33,6 @@ const SettingsCORS = {
         ["127.0.0.2", "*"],
         ["134.35.6.9", [20, 3000]]
     ];
-
-    
 
     //Nel caso in cui nessun indirizzo è permesso
     if(AllowOrigin === null) return callback(null, false);
@@ -117,7 +117,7 @@ fastify.route({
 
     try {
 
-      const html = await fs.promises.readFile("../../Front-end/Client.html");
+      const html = await fs.promises.readFile("../../Front-end/Index.html");
       res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
 
     } catch (error) {
