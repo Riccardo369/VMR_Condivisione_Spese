@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <script type = "file/javascript" src = "Client.js"></script>
+    <head>
+    <fieldset style="border: 2px double rgb(0, 51, 128)">
+        <legend style="color:blueviolet; font-family: papyrus;">
+        <strong>SEP</strong>
+    </legend>
+        </head>
+    <body bgcolor="#B0C4DE">
+        <h3>
+            <em>Inserisci i tuoi dati per accedere</em>
+        </h3>
+
+            <div>
+            <p style="text-align:center;">
+        Inserisci nickname:
+        <input type="text" placeholder="Nickname", id = "Nickname" value = "Nickname1"> 
+            </p>
+            </div>
+
+            <br>
+
+            <div>
+        <p style="text-align: center;">
+        Inserisci password:
+        <input type="password" placeholder="Inserisci password", id ="Password" value = "Password1">
+         </p>
+         </div>
+
+         <br>
+
+         <p style="text-align: center;">
+
+            <button onclick="RequestLogin()"> Conferma </button>
+
+           </p>
+
+           <script>
+
+            function RequestLogin() {
+
+                let HostServer = "127.0.0.1";
+                let PortServer = 3000;
+
+                const data = {
+                    "Nickname": ""+document.getElementById("Nickname").value+"",
+                    "Password": ""+document.getElementById("Password").value+""
+                };
+
+                var xhttp = new XMLHttpRequest();
+
+                xhttp.open("POST", "http://"+HostServer+":"+PortServer+"/login", true);
+                xhttp.setRequestHeader("Content-type", "application/json");
+                //xhttp.withCredentials = true;
+                
+                xhttp.send(JSON.stringify(data));
+    
+                /*fetch("http://"+HostServer+":"+PortServer+"/login", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(data => {
+                    //gestisci la risposta del server qui
+                    console.log("Token rilasciato dal server: "+data.headers.get("authorization"));
+                })
+                .catch((error) => {
+                    //console.log("ERRORE OLè");
+                    //gestisci gli errori qui
+                    console.error('Errore:', error);
+                });*/
+            }
+
+        </script>
+    </body>
+</fieldset>
+</html>

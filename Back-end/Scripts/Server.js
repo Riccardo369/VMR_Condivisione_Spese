@@ -1,28 +1,36 @@
 //Librerie
 const fastify = require('fastify')();
+const CORS = require('@fastify/cors');
+
 const fs = require("fs");
+
+//Librerie personali
 const SQLConnection = require("./ConnectionDB");
 const ManagementJWT = require("./ManagementJWT");
 const ExtraAuthorization = require("./ExtraAuthorization");
-const Security = require("./Security");
+const Security = require("./CryptingSecurity");
+const fastifyCors = require('fastify-cors');
 
 //Oggetti SINGLETON
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
 const StoreJWT = new ManagementJWT();
-const StoreTelephoneAuthorization = new ExtraAuthorization.TelephoneAuthorization();
+const ManagementSALT = new Security.UserSALT();
 
-const fastifyCors = require('fastify-cors');
-const CryptingText = require('./Security');
 
 const SettingsCORS = {
 
   origin: function(origin, callback){
+
+    console.log("Origin request: "+origin);
+
+    if(origin === undefined) return callback(null, true);
 
     //Liste degl' indirizzi permessi. In ogni lista c' è, l' indirizzo e tutte le porte ammissibili.
     //Primo elemento = indirizzo
     //Secondo elemento = tutte le porte con quell' indirizzo (nel caso in cui c'è '*' tutte le porte sono ammesse)
     let AllowOrigin = [
         ["localhost", "*"],
+        ["127.0.0.2", "*"],
         ["134.35.6.9", [20, 3000]]
     ];
 
@@ -66,8 +74,9 @@ fastify.register(async function (instance) {
     // Quando si chiude il server, esegui le operazioni di cleanup
     process.on('SIGINT', async () => {
 
+      ManagementSALT.SaveSALT();
       DB.Close();
-  
+
       // Chiudi il server solo quando le operazioni di cleanup sono terminate
       await instance.close();
       process.exit(0);
@@ -97,7 +106,6 @@ fastify.route({
 
 });
 
-
 fastify.route({
   method: "GET",
   path: "/",
@@ -105,12 +113,17 @@ fastify.route({
 
     console.log("GET/");
 
+    //console.log("Richiesta da: IPv4: "+req.ip+" and port: "+req.socket.remotePort);
+
     try {
 
-      const html = await fs.promises.readFile("../../Front-end/Client.html");
+      const html = await fs.promises.readFile("../../Front-end/Index.html");
       res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
 
-    } catch (error) { res.code(500).send("Internal Server Error"); }
+    } catch (error) {
+      console.log("Errore: "+error);
+      res.code(500).send("Internal Server Error");
+    }
 
   }
 });
@@ -184,6 +197,10 @@ fastify.route({
 
       console.log("POST/register");
 
+      let Body;
+      try{ Body = JSON.parse(req.body); }
+      catch(err){ Body = req.body; }
+
       let FirstName;
       let LastName;
       let Nickname;
@@ -191,16 +208,20 @@ fastify.route({
       let Email;
       let Password;
 
+      let Salt;
+
       try{
 
-        FirstName = req.body["FirstName"];
-        LastName = req.body["LastName"];
-        Nickname = req.body["Nickname"];
-        TelephoneNumber = req.body["TelephoneNumber"];
-        Email = req.body["Email"];
-        Password = req.body["Password"];
+        FirstName = Body["FirstName"];
+        LastName = Body["LastName"];
+        Nickname = Body["Nickname"];
+        TelephoneNumber = Body["TelephoneNumber"];
+        Email = Body["Email"];
+        Password = Body["Password"];
 
-        console.log(Password);
+        //Aggiungo il SALT e cripto la password
+        Salt = await CryptingSecurity.GetSALT(20);
+        Password = await CryptingSecurity.CryptingSHA256(Password + Salt); 
 
       }
       catch(e){
@@ -234,9 +255,13 @@ fastify.route({
         res.status(403);
       }
 
-      else{
+      else{ 
+
         console.log("Registrazione account "+Nickname+" effettuata");
+        ManagementSALT.AddSALT(Nickname, Salt);
+
         res.status(200);
+        
       } 
 
       res.send();
@@ -254,13 +279,30 @@ fastify.route({
 
     console.log("POST/login");
 
+    let IPv4_request = req.ip;
+    let Port_request = req.socket.localPort;
+
+    //Controllo che questa macchina abbia il blocco temporaneo
+    if(BruteforceBlocks.BlockIsActive(IPv4_request, Port_request)){
+      res.status(403);
+      console.log("La macchina IPv4: "+IPv4_request+" e Porta: "+Port_request+" è bloccata dal Bruteforce Block");
+      res.send();
+    }
+
     let Nickname;
     let Password;
 
+    let Body;
+    try{ Body = JSON.parse(req.body); }
+    catch(err){ Body = req.body; }
+
     try{
 
-      Nickname = req.body["Nickname"];
-      Password = await CryptingTextSALT(req.body["Password"]);
+      Nickname = Body["Nickname"];
+      Password = Body["Password"];
+
+      //Aggiungo il SALT salvato durante la registrazione di questo account e cripto la password
+      Password = await CryptingSecurity.CryptingSHA256(Password + (await ManagementSALT.GetSALT(Nickname)));
 
     }
     catch(e){
@@ -286,6 +328,7 @@ fastify.route({
     }
 
     if(rows.length === 0){
+      BruteforceBlocks.AddSignal(IPv4_request, Port_request);
       console.log("Credenziali non valide");
       res.status(401);
     }
@@ -318,10 +361,15 @@ fastify.route({
 
   console.log("DELETE/account");
 
+  let TokenJWT = req.headers["authorization"];
+
+  let Nickname;
+  let Password;
+
   try{
 
-    let Nickname = await StoreJWT.GetAccountFromJWT(req.headers["authorization"]);
-    let Password = await CryptingTextSALT(req.body["Password"]);
+    Nickname = await StoreJWT.GetAccountFromJWT(TokenJWT);
+    Password = await CryptingSecurity.CryptingSHA256(JSON.parse(req.body)["Password"] + (await ManagementSALT.GetSALT(Nickname)));
 
   }
   catch(e){
@@ -384,7 +432,8 @@ fastify.route({
   }
 
   console.log("Account cancellato "+Nickname);
-  await StoreJWT.RemoveJWT(req.headers["authorization"]);
+  await StoreJWT.RemoveJWT(TokenJWT);
+  await ManagementSALT.DeleteSALT(Nickname);
 
   res.status(200);
   res.send();
@@ -396,8 +445,7 @@ fastify.route({
 });
 
 
-fastify.listen({ port: 3000, host: "192.168.31.54" }, function (err, addr) {
+fastify.listen({ port: 3000, host: "127.0.0.1" }, function (err, addr) {
     if (err) console.error("Errore, il server non parte: " + err);
-    else console.log("Server in ascolto su " + addr);
-    
+    else console.log("Server in ascolto su " + addr);  
 });
