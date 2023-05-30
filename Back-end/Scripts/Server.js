@@ -1,21 +1,21 @@
 //Librerie
 const fastify = require('fastify')();
-const CORS = require('@fastify/cors');
-
+const fastifyCors = require('fastify-cors');
 const fs = require("fs");
 
 //Librerie personali
 const SQLConnection = require("./ConnectionDB");
 const ManagementJWT = require("./ManagementJWT");
 const ExtraAuthorization = require("./ExtraAuthorization");
-const Security = require("./CryptingSecurity");
-const fastifyCors = require('fastify-cors');
+const CryptingSecurity = require("./CryptingSecurity");
+const BruteforceBlock = require("./TimeProtection");
+
 
 //Oggetti SINGLETON
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
 const StoreJWT = new ManagementJWT();
-const ManagementSALT = new Security.UserSALT();
-
+const ManagementSALT = new CryptingSecurity.UserSALT();
+const BruteforceBlocks = new BruteforceBlock();
 
 const SettingsCORS = {
 
@@ -283,10 +283,11 @@ fastify.route({
     let Port_request = req.socket.localPort;
 
     //Controllo che questa macchina abbia il blocco temporaneo
-    if(BruteforceBlocks.BlockIsActive(IPv4_request, Port_request)){
+    if(await BruteforceBlocks.BlockIsActive(IPv4_request, Port_request)){
       res.status(403);
       console.log("La macchina IPv4: "+IPv4_request+" e Porta: "+Port_request+" è bloccata dal Bruteforce Block");
       res.send();
+      return;
     }
 
     let Nickname;
@@ -328,7 +329,7 @@ fastify.route({
     }
 
     if(rows.length === 0){
-      BruteforceBlocks.AddSignal(IPv4_request, Port_request);
+      await BruteforceBlocks.AddSignal(IPv4_request, Port_request);
       console.log("Credenziali non valide");
       res.status(401);
     }

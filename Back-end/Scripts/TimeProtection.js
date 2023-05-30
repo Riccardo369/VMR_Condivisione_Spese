@@ -16,9 +16,9 @@ class BruteforceBlocks{
 
     }
 
-    async BlockIsActive(Ipv4, port){
+    async BlockIsActive(IPv4, port){
 
-        let Block = this.GetBlock(IPv4, port);
+        let Block = await this.GetBlock(IPv4, port);
         if(Block === null || Block.ExpiredTimeBlock === null) return false;
         return true;
 
