@@ -1,17 +1,24 @@
 import React from 'react';
+const CryptoJS = require("crypto-js");
 
 const RegisterPage: React.FC = () => {
+
+  async function CryptingSHA256(Text: string){
+    return CryptoJS.SHA256(Text).toString();
+  }
+
+
   const requestRegister = () => {
     const HostServer = "192.168.31.54";
     const PortServer = 3000;
 
     const data = {
-      FirstName: document.getElementById("Nome")?.value,
-      LastName: document.getElementById("Cognome")?.value,
-      Nickname: document.getElementById("Nickname")?.value,
-      TelephoneNumber: document.getElementById("Numero di telefono")?.value,
-      Email: document.getElementById("Email")?.value,
-      Password: CryptingText(document.getElementById("Password")?.value),
+      FirstName: (document.getElementById("Nome") as HTMLInputElement).value,
+      LastName: (document.getElementById("Cognome") as HTMLInputElement).value,
+      Nickname: (document.getElementById("Nickname") as HTMLInputElement).value,
+      TelephoneNumber: (document.getElementById("Numero di telefono") as HTMLInputElement).value,
+      Email: (document.getElementById("Email") as HTMLInputElement).value,
+      Password: CryptingSHA256((document.getElementById("Password") as HTMLInputElement).value),
     };
 
     fetch(`http://${HostServer}:${PortServer}/register`, {
