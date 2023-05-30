@@ -335,9 +335,9 @@ fastify.route({
 
     else{
 
-      await StoreJWT.AddJWT(Nickname);
+      let TokenJWT = await StoreJWT.AddJWT(Nickname);
 
-      let TokenJWT = await StoreJWT.GetJWTFromAccount(Nickname);
+      //let TokenJWT = await StoreJWT.GetJWTFromAccount(Nickname);
 
       res.header('Authorization', TokenJWT);
       res.status(200);

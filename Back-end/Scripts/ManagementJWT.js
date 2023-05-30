@@ -12,11 +12,37 @@ class ManagementJWT {
 
   }
 
+  async ReplaceJWT(Nickname){
+
+    //Vecchio token
+    let OldJWT = this.Account_JWT[Nickname];
+
+    //Formo il nuovo JWT 
+    let NewJWT = jwt.sign({nickname: Nickname}, (await GenerateRandomString(20)), {
+      expiresIn: TimeStampOfExpired = jwt.decode(OldJWT, { complete: true }).payload.exp
+    });
+
+    //Cancello il vecchio collegamento JWT -> Account
+    delete this.Account_JWT[OldJWT];
+
+    //Creo il nuovo collegamento JWT -> Account
+    this.Account_JWT[NewJWT] = Nickname;
+
+    //Aggiorno il collegamento Nickname -> JWT
+    this.JWT_Account[Nickname] = NewJWT;
+
+    return NewJWT;
+
+  }
+
   async AddJWT(Nickname){
+
     let JWT = await CreateJWT(Nickname);
 
     this.JWT_Account[JWT] = Nickname;
     this.Account_JWT[Nickname] = JWT;
+
+    return JWT;
 
   }
 
@@ -113,6 +139,8 @@ async function GenerateRandomString(length) {
 
     return result;
 }
+
+
 
 async function CreateJWT(Nickname){
 
