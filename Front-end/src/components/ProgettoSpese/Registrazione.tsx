@@ -1,5 +1,5 @@
 import React from 'react';
-const CryptoJS = require("crypto-js");
+import CryptoJS from 'crypto-js';
 
 const RegisterPage: React.FC = () => {
 
@@ -21,7 +21,7 @@ const RegisterPage: React.FC = () => {
       Password: CryptingSHA256((document.getElementById("Password") as HTMLInputElement).value),
     };
 
-    fetch(`http://${HostServer}:${PortServer}/register`, {
+    fetch("http://"+HostServer+":"+PortServer+"/register", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
