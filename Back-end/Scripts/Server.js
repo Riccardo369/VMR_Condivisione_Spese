@@ -83,28 +83,6 @@ fastify.register(async function (instance) {
     });
 });
 
-fastify.route({
-
-  method: "GET",
-  path: "/RequestResource",
-  handler: async (req, res) => {
-
-    console.log("GET/RequestResource");
-
-    let Parameters = JSON.parse(req.body);
-
-    let Resource = Parameters["HTML"];
-
-    try {
-
-      const html = await fs.promises.readFile("../../Front-end/"+Resource+".html");
-      res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
-
-    } catch (error) { res.code(500).send("Internal Server Error"); }
-
-  }
-
-});
 
 fastify.route({
   method: "GET",
@@ -126,67 +104,6 @@ fastify.route({
     }
 
   }
-});
-
-fastify.route({
-  method: "GET",
-  path: "/Accedi.html",
-  handler: async (req, res) => {
-
-    console.log("GET/Accedi.html");
-
-    try {
-
-      const html = await fs.promises.readFile("../../Front-end/Accedi.html");
-      res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
-
-    } catch (error) { res.code(500).send("Internal Server Error"); }
-
-  }
-});
-
-fastify.route({
-  method: "GET",
-  path: "/Registrazione-1.html",
-  handler: async (req, res) => {
-
-    console.log("GET/Registrazione-1.html");
-
-    try {
-
-      const html = await fs.promises.readFile("../../Front-end/Registrazione-1.html");
-      res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
-
-    } catch (error) { res.code(500).send("Internal Server Error"); }
-
-  }
-});
-
-fastify.route({
-
-  method: "POST",
-  path: "/ConfirmTelephoneCode",
-  handler: async (req, res) => {
-
-    let Parameters = JSON.parse(req.body);
-
-    let Number = Parameters["Number"];
-    let Code = Parameters["Code"];
-
-    if(StoreTelephoneAuthorization.ConfirmBlock(Number, Code)) res.status(200).send();
-
-    else{
-
-      //Se si è riusciti ad inviare il nuovo SMS
-      if(StoreTelephoneAuthorization.AddBlock(Number)) res.status(401).send();
-
-      //Altrimenti
-      else res.status(401).send("Nuovo SMS non inviato");
-
-    }
-    
-  }
-
 });
 
 fastify.route({

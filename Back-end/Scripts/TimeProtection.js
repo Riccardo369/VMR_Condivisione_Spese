@@ -7,19 +7,22 @@ class BruteforceBlocks{
 
     CycleAttemps = 5; //Tentativi permessi prima che si attiva il prossimo blocco
 
-    constructor(){ this.Blocks = []; }
+    constructor(){ this.Blocks = {}; }
 
     async GetBlock(IPv4, port){
 
-        for(let B in this.Blocks) if(B.IPv4 === IPv4 && B.Port === port) return B;
-        return null;
+        return this.Blocks[IPv4+":"+port];
 
     }
 
     async BlockIsActive(IPv4, port){
 
-        let Block = await this.GetBlock(IPv4, port);
-        if(Block === null || Block.ExpiredTimeBlock === null) return false;
+        let block = await this.GetBlock(IPv4, port);
+
+        console.log(block);
+        console.log(Date.now())
+
+        if(block === undefined || block.ExpiredTimeBlock < Date.now()) return false;
         return true;
 
     }
@@ -27,34 +30,49 @@ class BruteforceBlocks{
     async AddSignal(IPv4, port){
 
         //Cerco il blocco
-        let Block = this.GetBlock(IPv4, port);
+        let block = await this.GetBlock(IPv4, port);
 
         //Se il blocco non esiste lo aggiungo
-        if(Block === null) this.Blocks.push(new Block(IPv4, port, Date.now(), this.CycleAttemps));
+        if(block === undefined){
+            this.Blocks[IPv4+":"+port] = new Block(Date.now(), this.CycleAttemps-1);
+            console.log("Aggiungo il blocco "+IPv4+":"+port);
+        }
         else{
 
+            console.log("Il blocco già esiste "+IPv4+":"+port);
+
             //Se il blocco è attivo non faccio niente
-            if(Block.ExpiredTimeBlock !== null) return;
+            if(block.ExpiredTimeBlock > Date.now()){
+                return;
+            }
 
             //Se quella macchina ha ancora dei tentativi, gli e ne tolgo uno
-            else if(Block.RemainAttemps > 0) Block.RemainAttemps -= 1;
+            else if(block.RemainAttemps > 1){
+                block.RemainAttemps -= 1;
+                console.log("Tentativi rimasti ("+IPv4+":"+port+"): "+block.RemainAttemps);
+            }
 
             //Se i tentativi sono finiti, attivo il time di blocco
             else{
 
-                Block.RemainAttemps = Date.now() + (Block.BlockLevel*MultiplyMinute);
-                Block.BlockLevel += 1;
+                console.log("Attivo il blocco ("+IPv4+":"+port+")");
+
+                block.ExpiredTimeBlock = Date.now() + (block.BlockLevel*block.MultiplyMinute*60*1000);
+                block.BlockLevel += 1;
+                block.RemainAttemps = this.CycleAttemps;
 
             }
 
         }
+
+        console.log("");
  
     }
 
     async RemoveExpiredBlock(){
 
         //Tolgo tutti blocchi scaduti da un tot di tempo (questo tot di tempo è TimeResetBlock)
-        this.Blocks = this.Blocks.filter((B) => (B.ExpiredTimeBlock >= Date.now()+this.TimeResetBlock));
+        //this.Blocks = this.Blocks.filter((B) => (B.ExpiredTimeBlock >= Date.now()+this.TimeResetBlock));
 
     }
 
@@ -62,18 +80,14 @@ class BruteforceBlocks{
 
 //Questa classe rappresenta un blocco, ogni volta
 class Block{
-
-    IPv4; //Indirizzo IPv4
-    Port; //Porta
+    
     ExpiredTimeBlock; //Tempo di attesa di blocco (se è null il blocco non c'è)
     RemainAttemps; //Tentativi rimasti prima che si attivi il prossimo blocco
     BlockLevel = 1; //Rappresenta il livello di blocco, più è alto e più il prossimo blocco impiegha più tempo
     MultiplyMinute = 5; //Rappresenta i minuti da dare (moltiplicato al BlockLevel) al prossimo blocco
 
-    constructor(IPv4, port, ExpiredBlock, RemainAttemps){
+    constructor(ExpiredBlock, RemainAttemps){
 
-        this.IPv4 = IPv4;
-        this.Port = port;
         this.ExpiredTimeBlock = ExpiredBlock;
         this.RemainAttemps = RemainAttemps;
 
