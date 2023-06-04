@@ -1,94 +1,69 @@
 import React, { useState } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonInput, IonButton, IonToast } from '@ionic/react';
 
 const ChangePasswordPage: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleChangePassword = () => {
     if (newPassword !== confirmPassword) {
-      setToastMessage('La nuova password e la conferma password non corrispondono.');
-      setShowToast(true);
+      setMessage('La nuova password e la conferma password non corrispondono.');
       return;
     }
 
-    async function changePasswordAPI(currentPassword: string, newPassword: string): Promise<void> {
-        try {
-          // Effettua la chiamata API per modificare la password utilizzando un'implementazione reale
-          // Esempio di implementazione con fetch():
-          const response = await fetch('/api/changePassword', {
-            method: 'POST',
-            body: JSON.stringify({ currentPassword, newPassword }),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-      
-          if (!response.ok) {
-            throw new Error('La chiamata API per modificare la password non è riuscita.');
-          }
-      
-          // Se la chiamata API ha successo, puoi elaborare la risposta qui
-          // Ad esempio, puoi parsare la risposta JSON o fare altre operazioni necessarie
-          // In questo esempio, non stiamo ritornando alcun dato, quindi la funzione restituisce 'void'
-      
-        } catch (error) {
-          throw new Error('Si è verificato un errore durante la chiamata API per modificare la password.');
+    fetch('/api/changePassword', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('La chiamata API per modificare la password non è riuscita.');
         }
-      }
-      
 
-    changePasswordAPI(currentPassword, newPassword)
-      .then(() => {
-        setToastMessage('La password è stata modificata con successo.');
-        setShowToast(true);
+        setMessage('La password è stata modificata con successo.');
       })
-      .catch((error: any) => { // Aggiungi il tipo 'any' al parametro 'error'
-        setToastMessage('Si è verificato un errore durante la modifica della password.');
-        setShowToast(true);
+      .catch(error => {
+        setMessage('Si è verificato un errore durante la modifica della password.');
       });
   };
 
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Cambia Password</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent>
-        <IonInput
+    <div className="container">
+      <h1>Cambia Password</h1>
+      <div className="form-group">
+        <label htmlFor="current-password">Password attuale:</label>
+        <input
           type="password"
-          placeholder="Password attuale"
+          id="current-password"
           value={currentPassword}
-          onIonChange={(e) => setCurrentPassword(e.detail.value!)}
+          onChange={e => setCurrentPassword(e.target.value)}
         />
-        <IonInput
+      </div>
+      <div className="form-group">
+        <label htmlFor="new-password">Nuova password:</label>
+        <input
           type="password"
-          placeholder="Nuova password"
+          id="new-password"
           value={newPassword}
-          onIonChange={(e) => setNewPassword(e.detail.value!)}
+          onChange={e => setNewPassword(e.target.value)}
         />
-        <IonInput
+      </div>
+      <div className="form-group">
+        <label htmlFor="confirm-password">Conferma nuova password:</label>
+        <input
           type="password"
-          placeholder="Conferma nuova password"
+          id="confirm-password"
           value={confirmPassword}
-          onIonChange={(e) => setConfirmPassword(e.detail.value!)}
+          onChange={e => setConfirmPassword(e.target.value)}
         />
-        <IonButton expand="full" onClick={handleChangePassword}>
-          Cambia Password
-        </IonButton>
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={toastMessage}
-          duration={3000}
-        />
-      </IonContent>
-    </IonPage>
+      </div>
+      <button onClick={handleChangePassword}>Cambia Password</button>
+      {message && <div className="message">{message}</div>}
+    </div>
   );
 };
 
