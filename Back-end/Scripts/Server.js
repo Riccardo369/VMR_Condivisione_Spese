@@ -9,13 +9,14 @@ const ManagementJWT = require("./ManagementJWT");
 const ExtraAuthorization = require("./ExtraAuthorization");
 const CryptingSecurity = require("./CryptingSecurity");
 const BruteforceBlock = require("./TimeProtection");
-
+const SecurityXSS = require("./ProtectionXSS");
 
 //Oggetti SINGLETON
 const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
 const StoreJWT = new ManagementJWT();
 const ManagementSALT = new CryptingSecurity.UserSALT();
 const BruteforceBlocks = new BruteforceBlock();
+const BlockXSS = new SecurityXSS()
 
 const SettingsCORS = {
 
@@ -135,6 +136,14 @@ fastify.route({
         TelephoneNumber = Body["TelephoneNumber"];
         Email = Body["Email"];
         Password = Body["Password"];
+
+        //Controllo che nessuno di questi dati (dati che dovrò ridare in qualche API) non causino problemi al browser del
+        //client attraverso il DOM
+        if(FirstName !== (await SecurityXSS.StringSanitized(FirstName))) throw new Error();
+        if(LastName !== (await SecurityXSS.StringSanitized(LastName))) throw new Error();
+        if(NickName !== (await SecurityXSS.StringSanitized(NickName))) throw new Error();
+        if(TelephoneNumber !== (await SecurityXSS.StringSanitized(TelephoneNumber))) throw new Error();
+        if(Email !== (await SecurityXSS.StringSanitized(Email))) throw new Error();
 
         //Aggiungo il SALT e cripto la password
         Salt = await CryptingSecurity.GetSALT(20);
@@ -361,7 +370,6 @@ fastify.route({
 }
 
 });
-
 
 fastify.listen({ port: 3000, host: "127.0.0.1" }, function (err, addr) {
     if (err) console.error("Errore, il server non parte: " + err);
