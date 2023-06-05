@@ -16,7 +16,7 @@ const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "S
 const StoreJWT = new ManagementJWT();
 const ManagementSALT = new CryptingSecurity.UserSALT();
 const BruteforceBlocks = new BruteforceBlock();
-const BlockXSS = new SecurityXSS()
+//const BlockXSS = new SecurityXSS()
 
 const SettingsCORS = {
 

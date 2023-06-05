@@ -10,14 +10,14 @@ const WelcomePage: React.FC = () => {
   const handleRegistration = () => {
     // Esegui qui la logica per mostrare il modulo di registrazione
     // Esempio di reindirizzamento a una pagina di registrazione
-    window.location.href = '/registration';
+    window.location.href = '/register';
   };
 
   return (
     <div>
-      <h1>Accedi o Registrati</h1>
+      <h1>Benvenuto, questa applicazione ti permetterà di  tenere traccia delle tue spese!</h1>
       <div className="welcome-message">
-        <p>Benvenuto!</p>
+        <p>Vuoi accedere o registrarti?</p>
       </div>
       <div className="button-container">
         <button onClick={handleLogin}>Accedi</button>
