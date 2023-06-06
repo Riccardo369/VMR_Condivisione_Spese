@@ -6,7 +6,6 @@ const fs = require("fs");
 //Librerie personali
 const SQLConnection = require("./ConnectionDB");
 const ManagementJWT = require("./ManagementJWT");
-const ExtraAuthorization = require("./ExtraAuthorization");
 const CryptingSecurity = require("./CryptingSecurity");
 const BruteforceBlock = require("./TimeProtection");
 const SecurityXSS = require("./ProtectionXSS");
@@ -16,7 +15,6 @@ const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "S
 const StoreJWT = new ManagementJWT();
 const ManagementSALT = new CryptingSecurity.UserSALT();
 const BruteforceBlocks = new BruteforceBlock();
-//const BlockXSS = new SecurityXSS()
 
 const SettingsCORS = {
 
@@ -140,10 +138,17 @@ fastify.route({
         //Controllo che nessuno di questi dati (dati che dovrò ridare in qualche API) non causino problemi al browser del
         //client attraverso il DOM
         if(FirstName !== (await SecurityXSS.StringSanitized(FirstName))) throw new Error();
+        console.log("ddd");
         if(LastName !== (await SecurityXSS.StringSanitized(LastName))) throw new Error();
-        if(NickName !== (await SecurityXSS.StringSanitized(NickName))) throw new Error();
+        console.log("ddd");
+        if(Nickname !== (await SecurityXSS.StringSanitized(Nickname))) throw new Error();
+        console.log("ddd");
         if(TelephoneNumber !== (await SecurityXSS.StringSanitized(TelephoneNumber))) throw new Error();
+        console.log("ddd");
         if(Email !== (await SecurityXSS.StringSanitized(Email))) throw new Error();
+        console.log("ddd");
+
+        console.log("ddd");
 
         //Aggiungo il SALT e cripto la password
         Salt = await CryptingSecurity.GetSALT(20);
