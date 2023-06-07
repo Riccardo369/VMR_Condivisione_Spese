@@ -1,4 +1,11 @@
 import React, { FormEvent, useState } from 'react';
+import config from './config';
+
+// Puoi accedere alle variabili come segue:
+const jwtToken = config.jwtToken;
+const serverAddress = config.serverAddress;
+const serverPort = config.serverPort;
+
 
 const EmailForm: React.FC = () => {
   const [newEmail, setNewEmail] = useState('');

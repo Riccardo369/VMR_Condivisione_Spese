@@ -1,8 +1,54 @@
 import React from 'react';
+import config from './config';
+
+// Puoi accedere alle variabili come segue:
+const jwtToken = config.jwtToken;
+const serverAddress = config.serverAddress;
+const serverPort = config.serverPort;
+
+interface FormControl {
+  invalid: boolean;
+  // Altre proprietà del controllo
+}
+
+const MyComponent2 = () => {
+  const emailFormControl: FormControl = { invalid: false };
+  const passwordFormControl: FormControl = { invalid: false };
+  const nicknameFormControl: FormControl = { invalid: false };
+
+  const isEmailInvalid = () => {
+    return emailFormControl && emailFormControl.invalid;
+  };
+
+  const isPasswordInvalid = () => {
+    return passwordFormControl && passwordFormControl.invalid;
+  };
+
+  const isNicknameInvalid = () => {
+    return nicknameFormControl && nicknameFormControl.invalid;
+  };
+
+  return (
+    <div>
+      {isEmailInvalid() && (
+        <label style={{ color: 'red' }}>Email non valida</label>
+      )}
+
+      {isPasswordInvalid() && (
+        <label style={{ color: 'red' }}>Password non valida</label>
+      )}
+
+      {isNicknameInvalid() && (
+        <label style={{ color: 'red' }}>Nickname non valido</label>
+      )}
+    </div>
+  );
+};
+
 
 class RequestServer{
 
-  HostServer = "192.168.31.54";
+  HostServer = "127.0.0.1";
   PortServer = 3000;
 
   Request(Method: string, Path: string, headers: {[key: string]: string}, Body: string){

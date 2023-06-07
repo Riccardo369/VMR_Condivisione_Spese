@@ -1,4 +1,11 @@
 import React from 'react';
+import config from './config';
+
+// Puoi accedere alle variabili come segue:
+const jwtToken = config.jwtToken;
+const serverAddress = config.serverAddress;
+const serverPort = config.serverPort;
+
 
 const PersonalAreaPage: React.FC = () => {
   return (
@@ -23,6 +30,12 @@ const PersonalAreaPage: React.FC = () => {
           </li>
           <li>
             <a href="RicaricaAccount.html">Ricarica account e/o gestisci spese</a>
+          </li>
+          <li>
+            <a href="SpesaSingola.tsx"> Effetua una spesa singola</a>
+          </li>
+          <li>
+            <a href="SpesaDiGruppo.tsx"> Effetua una spesa di gruppo</a>
           </li>
         </ul>
       </body>

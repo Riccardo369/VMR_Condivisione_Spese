@@ -1,4 +1,11 @@
 import React from 'react';
+import config from './config';
+
+// Puoi accedere alle variabili come segue:
+const jwtToken = config.jwtToken;
+const serverAddress = config.serverAddress;
+const serverPort = config.serverPort;
+
 
 const WelcomePage: React.FC = () => {
   const handleLogin = () => {

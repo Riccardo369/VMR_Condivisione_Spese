@@ -1,5 +1,54 @@
 import React from 'react';
 import CryptoJS from 'crypto-js';
+import config from './config';
+
+// Puoi accedere alle variabili come segue:
+const jwtToken = config.jwtToken;
+const serverAddress = config.serverAddress;
+const serverPort = config.serverPort;
+
+
+interface FormControl {
+  invalid: boolean;
+  // Altre proprietà del controllo
+}
+
+const MyComponent = () => {
+  const emailFormControl: FormControl = { invalid: false };
+  const passwordFormControl: FormControl = { invalid: false };
+  const nicknameFormControl: FormControl = { invalid: false };
+
+  const isEmailInvalid = () => {
+    return emailFormControl && emailFormControl.invalid;
+  };
+
+  const isPasswordInvalid = () => {
+    return passwordFormControl && passwordFormControl.invalid;
+  };
+
+  const isNicknameInvalid = () => {
+    return nicknameFormControl && nicknameFormControl.invalid;
+  };
+
+  return (
+    <div>
+      {isEmailInvalid() && (
+        <label style={{ color: 'red' }}>Email non valida</label>
+      )}
+
+      {isPasswordInvalid() && (
+        <label style={{ color: 'red' }}>Password non valida</label>
+      )}
+
+      {isNicknameInvalid() && (
+        <label style={{ color: 'red' }}>Nickname non valido</label>
+      )}
+    </div>
+  );
+};
+
+
+
 
 const RegisterPage: React.FC = () => {
 
@@ -56,19 +105,19 @@ const RegisterPage: React.FC = () => {
         <div>
           <p style={{ textAlign: 'center' }}>
             Inserisci nome:
-            <input type="text" id="Nome" placeholder="Nome" value="Veronika" />
+            <input type="text" id="Nome" placeholder="Nome"  />
 
             <br />
             <br />
 
             Inserisci cognome:
-            <input type="text" id="Cognome" placeholder="Cognome" value="Moriconi" />
+            <input type="text" id="Cognome" placeholder="Cognome" />
 
             <br />
             <br />
 
             Inserisci nickname:
-            <input type="text" id="Nickname" placeholder="Nickname" value="Vero47" />
+            <input type="text" id="Nickname" placeholder="Nickname"  />
           </p>
         </div>
 
@@ -82,14 +131,14 @@ const RegisterPage: React.FC = () => {
               type="number"
               id="Numero di telefono"
               placeholder="Numero di telefono"
-              value="1113334449"
+            
             />
 
             <br />
             <br />
 
             Inserisci email:
-            <input type="email" id="Email" placeholder="Inserisci email" value="vero.moriconi@gmail.com" />
+            <input type="email" id="Email" placeholder="Inserisci email"  />
           </p>
         </div>
 
@@ -97,7 +146,7 @@ const RegisterPage: React.FC = () => {
         <br />
 
         <p style={{ textAlign: 'center' }}>
-          Scegli una password (contenente almeno 8 caratteri, una maiuscola e un carattere speciale):
+          Scegli una password:
           <input type="password" id="Password" placeholder="Inserisci password" />
         </p>
 
