@@ -17,6 +17,7 @@
     "dompurify": "^3.0.3",
     "fastify": "^4.15.0",
     "fastify-cors": "^3.0.3",
+    "jsdom": "^22.1.0",
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^3.2.3",
     "typescript": "^5.0.4"
