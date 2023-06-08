@@ -1,6 +1,36 @@
-import React from 'react';
+
 import CryptoJS from 'crypto-js';
 import config from './config';
+import React, { useState } from 'react';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import ErrorMessage from './ErrorMessage';
+
+
+const Error: React.FC = () => {
+  const [error, setError] = useState<number | null>(null);
+
+  const handleRequest = () => {
+    axios.get('https://example.com/api')
+      .then(response => {
+        // Gestisci la risposta corretta
+      })
+      .catch((error: AxiosError) => {
+        if (error.response) {
+          const statusCode = error.response.status;
+          setError(statusCode);
+        } else {
+          setError(500); // Codice di errore generico
+        }
+      });
+  };
+
+  return (
+    <div>
+      <button onClick={handleRequest}>Effettua richiesta</button>
+      {error && <ErrorMessage errorCode={error} />}
+    </div>
+  );
+}
 
 // Puoi accedere alle variabili come segue:
 const jwtToken = config.jwtToken;
