@@ -29,7 +29,7 @@ const SettingsCORS = {
     //Secondo elemento = tutte le porte con quell' indirizzo (nel caso in cui c'è '*' tutte le porte sono ammesse)
     let AllowOrigin = [
         ["localhost", "*"],
-        ["127.0.0.2", "*"],
+        ["127.0.0.1", "*"],
         ["134.35.6.9", [20, 3000]]
     ];
 
@@ -138,17 +138,17 @@ fastify.route({
         //Controllo che nessuno di questi dati (dati che dovrò ridare in qualche API) non causino problemi al browser del
         //client attraverso il DOM
         if(FirstName !== (await SecurityXSS.StringSanitized(FirstName))) throw new Error();
-        console.log("ddd");
+        //console.log("ddd");
         if(LastName !== (await SecurityXSS.StringSanitized(LastName))) throw new Error();
-        console.log("ddd");
+        //console.log("ddd");
         if(Nickname !== (await SecurityXSS.StringSanitized(Nickname))) throw new Error();
-        console.log("ddd");
+        //console.log("ddd");
         if(TelephoneNumber !== (await SecurityXSS.StringSanitized(TelephoneNumber))) throw new Error();
-        console.log("ddd");
+        //console.log("ddd");
         if(Email !== (await SecurityXSS.StringSanitized(Email))) throw new Error();
-        console.log("ddd");
+        //console.log("ddd");
 
-        console.log("ddd");
+        //console.log("ddd");
 
         //Aggiungo il SALT e cripto la password
         Salt = await CryptingSecurity.GetSALT(20);
@@ -263,23 +263,29 @@ fastify.route({
       await BruteforceBlocks.AddSignal(IPv4_request, Port_request);
       console.log("Credenziali non valide");
       res.status(401);
+      res.send();
+      return;
     }
 
     else{
 
       let TokenJWT = await StoreJWT.AddJWT(Nickname);
 
-      //let TokenJWT = await StoreJWT.GetJWTFromAccount(Nickname);
-
+      //Passo il token attraverso l' header
       res.header('Authorization', TokenJWT);
+
+      //Con questo header, permetto al browser del client di prendere il token
+      res.header('Access-Control-Expose-Headers', 'Authorization')
       res.status(200);
 
       console.log("Token rilasciato: "+res.getHeader("Authorization"));
       console.log("Ben tornato "+Nickname);
+
+      res.send();
+      return;
     }
 
-    res.send();
-    return;
+    
 
   }
 
