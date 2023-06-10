@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import config from './config';
+import PersonalAreaPage from './AreaPersonale';
 
 // Puoi accedere alle variabili come segue:
 const jwtToken = config.jwtToken;
@@ -44,7 +45,7 @@ const GroupExpensePage: React.FC = () => {
       ))}
       <br />
       
-        <button>Continua</button>
+        <button onClick={PersonalAreaPage}>Continua</button>
       
     </div>
   );

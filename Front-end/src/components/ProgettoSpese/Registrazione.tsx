@@ -43,42 +43,6 @@ interface FormControl {
   // Altre proprietà del controllo
 }
 
-const MyComponent = () => {
-  const emailFormControl: FormControl = { invalid: false };
-  const passwordFormControl: FormControl = { invalid: false };
-  const nicknameFormControl: FormControl = { invalid: false };
-
-  const isEmailInvalid = () => {
-    return emailFormControl && emailFormControl.invalid;
-  };
-
-  const isPasswordInvalid = () => {
-    return passwordFormControl && passwordFormControl.invalid;
-  };
-
-  const isNicknameInvalid = () => {
-    return nicknameFormControl && nicknameFormControl.invalid;
-  };
-
-  return (
-    <div>
-      {isEmailInvalid() && (
-        <label style={{ color: 'red' }}>Email non valida</label>
-      )}
-
-      {isPasswordInvalid() && (
-        <label style={{ color: 'red' }}>Password non valida</label>
-      )}
-
-      {isNicknameInvalid() && (
-        <label style={{ color: 'red' }}>Nickname non valido</label>
-      )}
-    </div>
-  );
-};
-
-
-
 
 const RegisterPage: React.FC = () => {
 

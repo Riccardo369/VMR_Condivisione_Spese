@@ -3,6 +3,7 @@ import config from './config';
 import axios, { AxiosError } from 'axios';
 import ErrorMessage from './ErrorMessage';
 import React, { useState } from 'react';
+import AreaPersonale from './AreaPersonale';
 
 
 const Error: React.FC = () => {
@@ -42,13 +43,8 @@ interface FormControl {
 }
 
 const MyComponent2 = () => {
-  const emailFormControl: FormControl = { invalid: false };
   const passwordFormControl: FormControl = { invalid: false };
   const nicknameFormControl: FormControl = { invalid: false };
-
-  const isEmailInvalid = () => {
-    return emailFormControl && emailFormControl.invalid;
-  };
 
   const isPasswordInvalid = () => {
     return passwordFormControl && passwordFormControl.invalid;
@@ -60,10 +56,6 @@ const MyComponent2 = () => {
 
   return (
     <div>
-      {isEmailInvalid() && (
-        <label style={{ color: 'red' }}>Email non valida</label>
-      )}
-
       {isPasswordInvalid() && (
         <label style={{ color: 'red' }}>Password non valida</label>
       )}
@@ -144,7 +136,8 @@ const MyComponent: React.FC = () => {
         </div>
         <br />
         <p style={{ textAlign: "center" }}>
-          <button onClick={RequestLogin}>Conferma</button>
+        
+        <button onClick={RequestLogin}>Conferma</button>
         </p>
       </body>
     </fieldset>
