@@ -9,11 +9,13 @@ const serverPort = config.serverPort;
 
 const WelcomePage: React.FC = () => {
   const handleLogin = () => {
+    // Esegui qui la logica per mostrare il modulo di accesso
     // Esempio di reindirizzamento a una pagina di accesso
     window.location.href = '/login';
   };
 
   const handleRegistration = () => {
+    // Esegui qui la logica per mostrare il modulo di registrazione
     // Esempio di reindirizzamento a una pagina di registrazione
     window.location.href = '/register';
   };

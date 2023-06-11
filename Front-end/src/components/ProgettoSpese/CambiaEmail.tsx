@@ -13,6 +13,9 @@ const EmailForm: React.FC = () => {
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     
+    // Esegui qui la logica per salvare l'email
+    // Puoi utilizzare AJAX o inviare una richiesta a un server
+    
     // Esempio di visualizzazione della nuova email
     alert("Email salvata con successo: " + newEmail);
   };

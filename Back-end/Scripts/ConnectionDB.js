@@ -19,6 +19,7 @@ class SQLConnection {
 
   async GetQuery(query, parameters) {
     let conn;
+
     try { conn = await this.pool.getConnection(); }
     catch(e){ return undefined; }
 

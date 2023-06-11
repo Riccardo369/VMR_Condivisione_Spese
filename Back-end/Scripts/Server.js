@@ -138,21 +138,17 @@ fastify.route({
         //Controllo che nessuno di questi dati (dati che dovrò ridare in qualche API) non causino problemi al browser del
         //client attraverso il DOM
         if(FirstName !== (await SecurityXSS.StringSanitized(FirstName))) throw new Error();
-        //console.log("ddd");
         if(LastName !== (await SecurityXSS.StringSanitized(LastName))) throw new Error();
-        //console.log("ddd");
         if(Nickname !== (await SecurityXSS.StringSanitized(Nickname))) throw new Error();
-        //console.log("ddd");
         if(TelephoneNumber !== (await SecurityXSS.StringSanitized(TelephoneNumber))) throw new Error();
-        //console.log("ddd");
         if(Email !== (await SecurityXSS.StringSanitized(Email))) throw new Error();
-        //console.log("ddd");
 
-        //console.log("ddd");
+        //Non serve fare un controllo ad un attacco XSS perchè l' algoritmo SHA256 tirerà sempre fuori una stringa che contiene
+        //solo caratteri esadecimali, quindi non eseguibili come javascript
 
         //Aggiungo il SALT e cripto la password
         Salt = await CryptingSecurity.GetSALT(20);
-        Password = await CryptingSecurity.CryptingSHA256(Password + Salt); 
+        Password = await CryptingSecurity.CryptingText(Password + Salt); 
 
       }
       catch(e){
@@ -234,7 +230,7 @@ fastify.route({
       Password = Body["Password"];
 
       //Aggiungo il SALT salvato durante la registrazione di questo account e cripto la password
-      Password = await CryptingSecurity.CryptingSHA256(Password + (await ManagementSALT.GetSALT(Nickname)));
+      Password = await CryptingSecurity.CryptingText(Password + (await ManagementSALT.GetSALT(Nickname)));
 
     }
     catch(e){

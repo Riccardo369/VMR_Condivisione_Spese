@@ -1,59 +1,10 @@
-
-import CryptoJS from 'crypto-js';
-import config from './config';
-import React, { useState } from 'react';
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import ErrorMessage from './ErrorMessage';
-
-
-const Error: React.FC = () => {
-  const [error, setError] = useState<number | null>(null);
-
-  const handleRequest = () => {
-    axios.get('https://example.com/api')
-      .then(response => {
-        // Gestisci la risposta corretta
-      })
-      .catch((error: AxiosError) => {
-        if (error.response) {
-          const statusCode = error.response.status;
-          setError(statusCode);
-        } else {
-          setError(500); // Codice di errore generico
-        }
-      });
-  };
-
-  return (
-    <div>
-      <button onClick={handleRequest}>Effettua richiesta</button>
-      {error && <ErrorMessage errorCode={error} />}
-    </div>
-  );
-}
-
-// Puoi accedere alle variabili come segue:
-const jwtToken = config.jwtToken;
-const serverAddress = config.serverAddress;
-const serverPort = config.serverPort;
-
-
-interface FormControl {
-  invalid: boolean;
-  // Altre proprietà del controllo
-}
-
+import {RequestServer, CryptingText} from '../SharedModule';
 
 const RegisterPage: React.FC = () => {
 
-  async function CryptingSHA256(Text: string){
-    return CryptoJS.SHA256(Text).toString();
-  }
+  const requestRegister = async () => {
 
-
-  const requestRegister = () => {
-    const HostServer = "192.168.31.54";
-    const PortServer = 3000;
+    console.log("RequestRegister");
 
     const data = {
       FirstName: (document.getElementById("Nome") as HTMLInputElement).value,
@@ -61,26 +12,24 @@ const RegisterPage: React.FC = () => {
       Nickname: (document.getElementById("Nickname") as HTMLInputElement).value,
       TelephoneNumber: (document.getElementById("Numero di telefono") as HTMLInputElement).value,
       Email: (document.getElementById("Email") as HTMLInputElement).value,
-      Password: CryptingSHA256((document.getElementById("Password") as HTMLInputElement).value),
+      Password: (await CryptingText((document.getElementById("Password") as HTMLInputElement).value)),
     };
 
-    fetch("http://"+HostServer+":"+PortServer+"/register", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then(response => response.json())
-      .then(data => {
-        // gestisci la risposta del server qui
-        console.log(data);
-      })
-      .catch(error => {
-        console.log("ERRORE OLè");
-        // gestisci gli errori qui
-        console.error('Errore:', error);
-      });
+    let Response = await RequestServer("POST", "register", {}, JSON.stringify(data));
+    let Status = Response.Status;
+    let ErrorLabel = document.getElementById("Error Label");
+
+    if(Status === 200 && ErrorLabel){
+
+      ErrorLabel.textContent = "Registrazione consentita";
+
+      window.location.href = '/login';
+    }
+
+    else if(Status === 400 && ErrorLabel) ErrorLabel.textContent = "I dati non sono stati passati nel modo corretto";
+    else if(Status === 403 && ErrorLabel) ErrorLabel.textContent = "Questo account esiste già";
+    else if(Status === 500 && ErrorLabel) ErrorLabel.textContent = "Il server sta avendo problemi interni di funzionamento";
+
   };
 
   return (
@@ -99,19 +48,19 @@ const RegisterPage: React.FC = () => {
         <div>
           <p style={{ textAlign: 'center' }}>
             Inserisci nome:
-            <input type="text" id="Nome" placeholder="Nome"  />
+            <input type="text" id="Nome" placeholder="Nome" value = "Riccardo"/>
 
             <br />
             <br />
 
             Inserisci cognome:
-            <input type="text" id="Cognome" placeholder="Cognome" />
+            <input type="text" id="Cognome" placeholder="Cognome" value = "Marcaccio"/>
 
             <br />
             <br />
 
             Inserisci nickname:
-            <input type="text" id="Nickname" placeholder="Nickname"  />
+            <input type="text" id="Nickname" placeholder="Nickname" value = "Nickname1"/>
           </p>
         </div>
 
@@ -125,14 +74,14 @@ const RegisterPage: React.FC = () => {
               type="number"
               id="Numero di telefono"
               placeholder="Numero di telefono"
-            
+              value = "3331112220"
             />
 
             <br />
             <br />
 
             Inserisci email:
-            <input type="email" id="Email" placeholder="Inserisci email"  />
+            <input type="email" id="Email" placeholder="Inserisci email"  value = "email1"/>
           </p>
         </div>
 
@@ -141,10 +90,13 @@ const RegisterPage: React.FC = () => {
 
         <p style={{ textAlign: 'center' }}>
           Scegli una password:
-          <input type="password" id="Password" placeholder="Inserisci password" />
+          <input type="password" id="Password" placeholder="Inserisci password" value = "Password1"/>
         </p>
 
         <p style={{ textAlign: 'center' }}>
+        <span id="Error Label" style={{ display: "block", marginBottom: "10px", color: "red"}}>
+          
+          </span>
           <button onClick={requestRegister}>Conferma</button>
         </p>
       </body>

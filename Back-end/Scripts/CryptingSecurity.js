@@ -1,7 +1,7 @@
 const CryptoJS = require("crypto-js");
 const fs = require('fs');
 
-async function CryptingSHA256(Text){
+async function CryptingText(Text){
     return CryptoJS.SHA256(Text).toString();
 }
 
@@ -67,4 +67,4 @@ class UserSALT{
 
 
 
-module.exports = {CryptingSHA256, GetSALT, UserSALT};
+module.exports = {CryptingText, GetSALT, UserSALT};

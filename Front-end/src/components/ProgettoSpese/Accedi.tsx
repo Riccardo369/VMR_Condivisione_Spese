@@ -1,115 +1,36 @@
-
-import config from './config';
-import axios, { AxiosError } from 'axios';
-import ErrorMessage from './ErrorMessage';
-import React, { useState } from 'react';
-import AreaPersonale from './AreaPersonale';
-
-
-const Error: React.FC = () => {
-  const [error, setError] = useState<number | null>(null);
-
-  const handleRequest = () => {
-    axios.get('https://example.com/api')
-      .then(response => {
-        // Gestisci la risposta corretta
-      })
-      .catch((error: AxiosError) => {
-        if (error.response) {
-          const statusCode = error.response.status;
-          setError(statusCode);
-        } else {
-          setError(500); // Codice di errore generico
-        }
-      });
-  };
-
-  return (
-    <div>
-      <button onClick={handleRequest}>Effettua richiesta</button>
-      {error && <ErrorMessage errorCode={error} />}
-    </div>
-  );
-}
-
-// Puoi accedere alle variabili come segue:
-const jwtToken = config.jwtToken;
-const serverAddress = config.serverAddress;
-const serverPort = config.serverPort;
-
-interface FormControl {
-  invalid: boolean;
-  // Altre proprietà del controllo
-}
-
-const MyComponent2 = () => {
-  const passwordFormControl: FormControl = { invalid: false };
-  const nicknameFormControl: FormControl = { invalid: false };
-
-  const isPasswordInvalid = () => {
-    return passwordFormControl && passwordFormControl.invalid;
-  };
-
-  const isNicknameInvalid = () => {
-    return nicknameFormControl && nicknameFormControl.invalid;
-  };
-
-  return (
-    <div>
-      {isPasswordInvalid() && (
-        <label style={{ color: 'red' }}>Password non valida</label>
-      )}
-
-      {isNicknameInvalid() && (
-        <label style={{ color: 'red' }}>Nickname non valido</label>
-      )}
-    </div>
-  );
-};
-
-
-class RequestServer{
-
-  HostServer = "127.0.0.1";
-  PortServer = 3000;
-
-  Request(Method: string, Path: string, headers: {[key: string]: string}, Body: string){
-  
-    const HeadersValues = new Headers();
-    for(let l in headers) HeadersValues.append(l, headers[l]);
-
-    fetch("http://" + this.HostServer + ":" + this.PortServer + "/" + Path, {
-      method: Method,
-      headers: HeadersValues,
-      body: Body
-    })
-      .then(response => response.json())
-      .then(data => {
-        //gestisci la risposta del server qui
-        console.log(data);
-      })
-      .catch((error) => {
-        console.log("ERRORE OLè");
-        //gestisci gli errori qui
-        console.error('Errore:', error);
-      });
-
-  }
-}
+import {RequestServer, CryptingText} from '../SharedModule';
+import storage from '../SharedAreaVariables';
 
 const MyComponent: React.FC = () => {
-  const RequestLogin = () => {
-    let HostServer = "192.168.31.54";
-    let PortServer = 3000;
+
+  const RequestLogin = async () => {
 
     console.log("RequestLogin");
 
     const data = {
       "Nickname": (document.getElementById("Nickname") as HTMLInputElement).value,
-      "Password": (document.getElementById("Password") as HTMLInputElement).value
+      "Password": (await CryptingText((document.getElementById("Password") as HTMLInputElement).value))
     };
 
-    new RequestServer().Request("POST", "/Login", {}, JSON.stringify(data));
+    let Response = await RequestServer("POST", "login", {}, JSON.stringify(data));
+    let Status = Response.Status;
+    let ErrorLabel = document.getElementById("Error Label");
+
+    if(Status === 200 && ErrorLabel){
+
+      ErrorLabel.textContent = "Accesso consentito";
+
+      await storage.setItem('Token_JWT', ""+Response.Headers.get("Authorization"));
+      await storage.setItem('Nickname', (document.getElementById("Nickname") as HTMLInputElement).value);
+
+      window.location.href = '/PersonalArea';
+    }
+
+    else if(Status === 400 && ErrorLabel) ErrorLabel.textContent = "I dati non sono stati passati nel modo corretto";
+    else if(Status === 401 && ErrorLabel) ErrorLabel.textContent = "Credenziali non valide";
+    else if(Status === 403 && ErrorLabel) ErrorLabel.textContent = "La tua richiesta è stata bloccata";
+    else if(Status === 500 && ErrorLabel) ErrorLabel.textContent = "Il server sta avendo problemi interni di funzionamento";
+
   };
 
   return (
@@ -124,20 +45,22 @@ const MyComponent: React.FC = () => {
         <div>
           <p style={{ textAlign: "center" }}>
             Inserisci nickname:
-            <input type="text" placeholder="Nickname" id="Nickname" />
+            <input type="text" placeholder="Nickname" id="Nickname"/>
           </p>
         </div>
         <br />
         <div>
           <p style={{ textAlign: "center" }}>
             Inserisci password:
-            <input type="password" placeholder="Inserisci password" id="Password" />
+            <input type="password" placeholder="Inserisci password" id="Password"/>
           </p>
         </div>
         <br />
         <p style={{ textAlign: "center" }}>
-        
-        <button onClick={RequestLogin}>Conferma</button>
+        <span id="Error Label" style={{ display: "block", marginBottom: "10px", color: "red"}}>
+          
+        </span>
+          <button onClick={RequestLogin}>Conferma</button>
         </p>
       </body>
     </fieldset>
