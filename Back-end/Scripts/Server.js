@@ -276,9 +276,10 @@ fastify.route({
       //Creo la nuova password da mettere nel database
       let Response = await DB.GetQuery("update Account set Password = ? where Nickname = ?", [NewPassword, Nickname]);
 
-      console.log("Response: "+Response);
+      //Nel caso in cui il DB si sia chiuso in questo istante, non riaggiorno il SALT
       if(Response !== undefined) await ManagementSALT.AddSALT(Nickname, Salt);
 
+      //Creo il nuovo token
       let TokenJWT = await StoreJWT.AddJWT(Nickname);
 
       //Passo il token attraverso l' header
@@ -293,9 +294,7 @@ fastify.route({
 
       res.send();
       return;
-    }
-
-    
+    } 
 
   }
 
