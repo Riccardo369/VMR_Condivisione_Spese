@@ -185,7 +185,7 @@ fastify.route({
       else{ 
 
         console.log("Registrazione account "+Nickname+" effettuata");
-        ManagementSALT.AddSALT(Nickname, Salt);
+        await ManagementSALT.AddSALT(Nickname, Salt);
 
         res.status(200);
         
@@ -218,6 +218,8 @@ fastify.route({
     }
 
     let Nickname;
+    let OldPassword;
+
     let Password;
 
     let Body;
@@ -227,10 +229,10 @@ fastify.route({
     try{
 
       Nickname = Body["Nickname"];
-      Password = Body["Password"];
+      OldPassword = Body["Password"];
 
       //Aggiungo il SALT salvato durante la registrazione di questo account e cripto la password
-      Password = await CryptingSecurity.CryptingText(Password + (await ManagementSALT.GetSALT(Nickname)));
+      Password = await CryptingSecurity.CryptingText(OldPassword + (await ManagementSALT.GetSALT(Nickname)));
 
     }
     catch(e){
@@ -264,6 +266,18 @@ fastify.route({
     }
 
     else{
+
+      //Modifico il SALT e riaggiorno la password
+
+      //Creo un nuovo SALT
+      let Salt = await CryptingSecurity.GetSALT(20);
+      let NewPassword = await CryptingSecurity.CryptingText(OldPassword + Salt);
+
+      //Creo la nuova password da mettere nel database
+      let Response = await DB.GetQuery("update Account set Password = ? where Nickname = ?", [NewPassword, Nickname]);
+
+      console.log("Response: "+Response);
+      if(Response !== undefined) await ManagementSALT.AddSALT(Nickname, Salt);
 
       let TokenJWT = await StoreJWT.AddJWT(Nickname);
 
