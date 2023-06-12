@@ -1,5 +1,6 @@
 import {RequestServer, CryptingText} from '../SharedModule';
 import storage from '../SharedAreaVariables';
+import WelcomePage from './Index';
 
 const MyComponent: React.FC = () => {
 
@@ -61,6 +62,7 @@ const MyComponent: React.FC = () => {
           
         </span>
           <button onClick={RequestLogin}>Conferma</button>
+          <button onClick={WelcomePage}>Torna indietro</button>
         </p>
       </body>
     </fieldset>

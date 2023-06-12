@@ -1,4 +1,5 @@
 import {RequestServer, CryptingText} from '../SharedModule';
+import WelcomePage from './Index';
 
 const RegisterPage: React.FC = () => {
 
@@ -98,6 +99,7 @@ const RegisterPage: React.FC = () => {
           
           </span>
           <button onClick={requestRegister}>Conferma</button>
+          <button onClick={WelcomePage}>Torna indietro</button>
         </p>
       </body>
     </div>
