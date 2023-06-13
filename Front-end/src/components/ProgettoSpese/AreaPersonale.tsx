@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import storage from '../SharedAreaVariables';
-import WelcomePage from './Index';
 
 const PersonalAreaPage: React.FC = () => {
+
+  const handleIndex = async () => {
+
+    await storage.setItem('Token_JWT', "");
+    await storage.setItem('Nickname', "");
+
+    window.location.href = "/";
+  }
 
   const [Nickname, SetNickname] = useState<string>('');
   const [Token_JWT, SetTokenJWT] = useState<string>('');
@@ -10,16 +18,13 @@ const PersonalAreaPage: React.FC = () => {
   useEffect(() => {
 
     const fetchData = async () => {
-      SetNickname((await storage.getItem('Nickname'))+"" || '');
-      SetTokenJWT((await storage.getItem('Token_JWT'))+"" || '');
+      SetNickname((await storage.getItem('Nickname')) || '');
+      SetTokenJWT((await storage.getItem('Token_JWT')) || '');
     };
 
     fetchData();
 
   }, []);
-
-  console.log("Token JWT ottenuto: "+Token_JWT);
-
 
   return (
     <div>
@@ -49,13 +54,13 @@ const PersonalAreaPage: React.FC = () => {
             <a href="SpesaSingola.tsx"> Effetua una spesa singola</a>
           </li>
           <li>
-            <a href="SpesaDiGruppo.tsx"> Effetua una spesa di gruppo</a>
+            <a href="SpesaDiGruppo.tsx"> Effettua una spesa di gruppo</a>
           </li>
           <li>
-            <a href="eliminaAccount.tsx"> Elimina account</a>
+            <Link to="/DeleteAccount">Elimina account</Link>
           </li>
         </ul>
-        <button onClick={WelcomePage}>Torna indietro</button>
+        <button onClick={handleIndex}>Torna indietro</button>
       </body>
     </div>
   );

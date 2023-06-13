@@ -1,7 +1,10 @@
 import {RequestServer, CryptingText} from '../SharedModule';
-import WelcomePage from './Index';
 
 const RegisterPage: React.FC = () => {
+
+  const handleIndex = () => {
+    window.location.href = "/";
+  }
 
   const requestRegister = async () => {
 
@@ -49,19 +52,19 @@ const RegisterPage: React.FC = () => {
         <div>
           <p style={{ textAlign: 'center' }}>
             Inserisci nome:
-            <input type="text" id="Nome" placeholder="Nome" value = "Riccardo"/>
+            <input type="text" id="Nome" placeholder="Nome"/>
 
             <br />
             <br />
 
             Inserisci cognome:
-            <input type="text" id="Cognome" placeholder="Cognome" value = "Marcaccio"/>
+            <input type="text" id="Cognome" placeholder="Cognome"/>
 
             <br />
             <br />
 
             Inserisci nickname:
-            <input type="text" id="Nickname" placeholder="Nickname" value = "Nickname1"/>
+            <input type="text" id="Nickname" placeholder="Nickname"/>
           </p>
         </div>
 
@@ -75,14 +78,13 @@ const RegisterPage: React.FC = () => {
               type="number"
               id="Numero di telefono"
               placeholder="Numero di telefono"
-              value = "3331112220"
             />
 
             <br />
             <br />
 
             Inserisci email:
-            <input type="email" id="Email" placeholder="Inserisci email"  value = "email1"/>
+            <input type="email" id="Email" placeholder="Inserisci email"/>
           </p>
         </div>
 
@@ -91,15 +93,19 @@ const RegisterPage: React.FC = () => {
 
         <p style={{ textAlign: 'center' }}>
           Scegli una password:
-          <input type="password" id="Password" placeholder="Inserisci password" value = "Password1"/>
+          <input type="password" id="Password" placeholder="Inserisci password"/>
         </p>
 
         <p style={{ textAlign: 'center' }}>
         <span id="Error Label" style={{ display: "block", marginBottom: "10px", color: "red"}}>
           
           </span>
+          <p>
           <button onClick={requestRegister}>Conferma</button>
-          <button onClick={WelcomePage}>Torna indietro</button>
+          </p>
+          <p>
+          <button onClick={handleIndex}>Torna indietro</button>
+          </p>
         </p>
       </body>
     </div>

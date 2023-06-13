@@ -82,29 +82,6 @@ fastify.register(async function (instance) {
     });
 });
 
-
-fastify.route({
-  method: "GET",
-  path: "/",
-  handler: async (req, res) => {
-
-    console.log("GET/");
-
-    //console.log("Richiesta da: IPv4: "+req.ip+" and port: "+req.socket.remotePort);
-
-    try {
-
-      const html = await fs.promises.readFile("../../Front-end/Index.html");
-      res.code(200).header("Content-Type", "text/html; charset=utf-8").send(html);
-
-    } catch (error) {
-      console.log("Errore: "+error);
-      res.code(500).send("Internal Server Error");
-    }
-
-  }
-});
-
 fastify.route({
 
     method: "POST",
@@ -310,14 +287,19 @@ fastify.route({
 
   let TokenJWT = req.headers["authorization"];
 
+  console.log("Token: "+TokenJWT);
+
+  let Body;
+  try{ Body = JSON.parse(req.body); }
+  catch(err){ Body = req.body; }
+
   let Nickname;
   let Password;
 
+  Nickname = await StoreJWT.GetAccountFromJWT(TokenJWT);
+
   try{
-
-    Nickname = await StoreJWT.GetAccountFromJWT(TokenJWT);
-    Password = await CryptingSecurity.CryptingSHA256(JSON.parse(req.body)["Password"] + (await ManagementSALT.GetSALT(Nickname)));
-
+    Password = (await CryptingSecurity.CryptingText(Body["Password"] + (await ManagementSALT.GetSALT(Nickname))));
   }
   catch(e){
 
@@ -327,7 +309,6 @@ fastify.route({
     return;
 
   }
-  
 
   if(Nickname === null){
     console.log("JWT non valido");
@@ -338,33 +319,7 @@ fastify.route({
   //Controllare se esiste già l' account implica un maggior rischio di passare i dati nella rete
   //Se esiste viene cancellato
   //Se non esiste non viene cancellato
-  //Se l' hacker ha già la password non puoi saperlo da questa API (deve avere anche il suo JWT)
-
-
-  //Qui bisogna controllare se la password è corretta
-
-  //Qui faccio una richiesta perchè, se la password non è quella, l' hacker sa solo che la password che lui stesso ha messo
-  //non è quella corretta.
-  //Se invece la password è quella corretta, l' account tanto verrà eliminato, ma se è l' hacker a fare questo,
-  //la sapeva già, sicuramente non l ha scoperta da questa API
-
-
-  let Response = await DB.GetQuery("select Nickname from account where Nickname = ? and Password = ?", [Nickname, Password]);
-
-  if(Response === undefined){
-
-    console.log("Problemi nell' eliminazione del tuo account "+Nickname);
-    res.status(500);
-    res.send();
-    return;
-
-  }
-
-  else if(Response.length === 0){
-    res.status(401);
-    res.send();
-    return;
-  }
+  //Se l' hacker ha già la password la sapeva già, ma non da questa API (deve avere anche il JWT della vittima)
   
   let rows;
 
@@ -378,14 +333,29 @@ fastify.route({
     console.log("Problemi nell' eliminazione del tuo account");
   }
 
-  console.log("Account cancellato "+Nickname);
-  await StoreJWT.RemoveJWT(TokenJWT);
-  await ManagementSALT.DeleteSALT(Nickname);
+  if(rows.affectedRows > 0){
+    console.log("Account cancellato "+Nickname);
+    await StoreJWT.RemoveJWT(TokenJWT);
+    await ManagementSALT.DeleteSALT(Nickname);
 
-  res.status(200);
-  res.send();
+    res.status(200);
+    res.send();
 
-  return;
+    return;
+  }
+
+  else{
+
+    console.log("La password non è corretta");
+    res.status(401);
+    res.send();
+    return;
+
+  }
+
+
+
+  
 
 }
 

@@ -24,6 +24,7 @@ import MyComponent from './components/ProgettoSpese/Accedi';
 import RegisterPage from './components/ProgettoSpese/Registrazione';
 import WelcomePage from './components/ProgettoSpese/Index';
 import PersonalAreaPage from "./components/ProgettoSpese/AreaPersonale";
+import EliminaAccount from './components/ProgettoSpese/eliminaAccount';
 
 
 setupIonicReact();
@@ -40,6 +41,9 @@ const App: React.FC = () => (
           <Redirect to="/" />
 
           <Route exact path="/PersonalArea" component = {PersonalAreaPage}/>
+          <Redirect to="/" />
+
+          <Route exact path="/DeleteAccount" component = {EliminaAccount}/>
           <Redirect to="/" />
 
           <Route exact path="/" component = {WelcomePage}/>

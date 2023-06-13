@@ -1,8 +1,11 @@
 import {RequestServer, CryptingText} from '../SharedModule';
 import storage from '../SharedAreaVariables';
-import WelcomePage from './Index';
 
 const MyComponent: React.FC = () => {
+
+  const handleIndex = () => {
+    window.location.href = "/";
+  }
 
   const RequestLogin = async () => {
 
@@ -61,8 +64,12 @@ const MyComponent: React.FC = () => {
         <span id="Error Label" style={{ display: "block", marginBottom: "10px", color: "red"}}>
           
         </span>
+          <p>
           <button onClick={RequestLogin}>Conferma</button>
-          <button onClick={WelcomePage}>Torna indietro</button>
+          </p>
+          <p>
+          <button onClick={handleIndex}>Torna indietro</button>
+          </p>
         </p>
       </body>
     </fieldset>
