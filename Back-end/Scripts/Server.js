@@ -11,7 +11,7 @@ const BruteforceBlock = require("./TimeProtection");
 const SecurityXSS = require("./ProtectionXSS");
 
 //Oggetti SINGLETON
-const DB = new SQLConnection("127.0.0.1", "User", "PasswordSpeseCondiviseDB", "SEP");
+const DB = new SQLConnection("127.0.0.1", "UserSEP", "PasswordSpeseCondiviseDB", "SEP");
 const StoreJWT = new ManagementJWT();
 const ManagementSALT = new CryptingSecurity.UserSALT();
 const BruteforceBlocks = new BruteforceBlock();

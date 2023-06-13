@@ -1,0 +1,7 @@
+Il sistema software SEP si appoggia ad un database MySQL. Il file "Database sep.sql" contiene i comandi necessari per:
+
+- creare il database con le relative tabelle.
+- Creare un utente 'UserSEP'@'127.0.0.1' con password 'PasswordSpeseCondiviseDB'
+- Imposta i privilegi necessari di 'UserSEP' per il DB sep
+
+Il sistema software SEP accederà ogni volta al DB sep con le credenziali 'UserSEP'@'127.0.0.1' e password 'PasswordSpeseCondiviseDB'

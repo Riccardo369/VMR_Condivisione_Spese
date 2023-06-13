@@ -1,4 +1,0 @@
-POST/register: registrazione                    X
-POST/login: login                               X
-DELETE/account* : eliminazione dell' account
-PUT/payment: aggiunta di un pagamento
