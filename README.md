@@ -9,4 +9,5 @@ Procedimento di attivazione
 - Aprire 2 terminali
 
 Per attivare il back-end con node.js, il file main è 'Back-end/Scripts/Server.js'
+
 Per attivare il front-end con ionic, la cartella è 'Front-end'
