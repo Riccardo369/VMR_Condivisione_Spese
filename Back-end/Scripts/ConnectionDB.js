@@ -24,7 +24,8 @@ class SQLConnection {
     catch(e){ return undefined; }
 
     try{
-      
+
+      //Questo metodo conn.execute(query, parameters) permette la protezione da SQL injection
       const [rows, fields] = await conn.execute(query, parameters);
       return rows;
       
