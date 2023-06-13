@@ -8,5 +8,5 @@ Procedimento di attivazione
 
 - Aprire 2 terminali
 
-- Andare su 'Back-end/Scripts' dal 1° terminale e digitare 'npm install' e successivamente 'node Server.js'
-- Andare su 'Front-end' dal 2° terminale e digitare 'npm install' e successivamente 'ionic serve'
+Per attivare il back-end con node.js, il file main è 'Back-end/Scripts/Server.js'
+Per attivare il front-end con ionic, la cartella è 'Front-end'
