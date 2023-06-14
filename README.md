@@ -1,13 +1,8 @@
 # VMR_Condivisione_Spese
 
-Pre-requisiti di installazione
+'Progettazione/Database sep.sql'. File che contiene tutti i comandi necessari per creare il Database MySQL SEP, con le dovute tabelle e l' utente con i permessi adeguati
 
-- Importare sul proprio database MySQL locale il file 'Progettazione/Database sep.sql'. Sul file 'Progettazione/Documentation' sono spiegate tutte le azioni del file .sql
 
-Procedimento di attivazione
+'Back-end/Scripts/Server.js'. File da attivare in node js per il back-end
 
-- Aprire 2 terminali
-
-Per attivare il back-end con node.js, il file main è 'Back-end/Scripts/Server.js'
-
-Per attivare il front-end con ionic, la cartella è 'Front-end'
+'Front-end'. Cartella da cui attivare il progetto ionic serve per il front-end
