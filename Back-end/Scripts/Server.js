@@ -114,11 +114,13 @@ fastify.route({
 
         //Controllo che nessuno di questi dati (dati che dovrò ridare in qualche API) non causino problemi al browser del
         //client attraverso il DOM
-        if(FirstName !== (await SecurityXSS.StringSanitized(FirstName))) throw new Error();
-        if(LastName !== (await SecurityXSS.StringSanitized(LastName))) throw new Error();
-        if(Nickname !== (await SecurityXSS.StringSanitized(Nickname))) throw new Error();
-        if(TelephoneNumber !== (await SecurityXSS.StringSanitized(TelephoneNumber))) throw new Error();
-        if(Email !== (await SecurityXSS.StringSanitized(Email))) throw new Error();
+        if(FirstName !== (await SecurityXSS.StringSanitized(FirstName)) ||
+           LastName !== (await SecurityXSS.StringSanitized(LastName)) ||
+           Nickname !== (await SecurityXSS.StringSanitized(Nickname)) ||
+           TelephoneNumber !== (await SecurityXSS.StringSanitized(TelephoneNumber)) ||
+           Email !== (await SecurityXSS.StringSanitized(Email)) ||
+           Nickname === "" ||
+           Password === "") throw new Error();
 
         //Non serve fare un controllo ad un attacco XSS perchè l' algoritmo SHA256 tirerà sempre fuori una stringa che contiene
         //solo caratteri esadecimali, quindi non eseguibili come javascript

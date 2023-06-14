@@ -9,17 +9,29 @@ export async function CryptingText(Text: string){
 
 export async function RequestServer(Method: string, Path: string, headers: {[key: string]: string}, Body: string){
 
-  let response = await fetch("http://" + IP_Server + ":" + Port_Server + "/" + Path,{
+  try{
+
+    let response = await fetch("http://" + IP_Server + ":" + Port_Server + "/" + Path,{
       method: Method,
       headers: headers,
       body: Body
     });
 
-  let Response = {
+  return {
     Status: response.status,
     Headers: response.headers,
     Body: response.body
   }
 
-  return Response;
+  }
+
+  catch(e){
+    return {
+      Status: null,
+      Headers: new Headers(),
+      Body: ""
+    }
+  }
+
+  
 }

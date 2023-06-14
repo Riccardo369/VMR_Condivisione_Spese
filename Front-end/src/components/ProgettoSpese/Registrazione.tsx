@@ -8,6 +8,7 @@ const RegisterPage: React.FC = () => {
 
   const requestRegister = async () => {
 
+
     console.log("RequestRegister");
 
     const data = {
@@ -19,20 +20,22 @@ const RegisterPage: React.FC = () => {
       Password: (await CryptingText((document.getElementById("Password") as HTMLInputElement).value)),
     };
 
+    let ErrorLabel = document.getElementById("Error Label");
+    if(ErrorLabel) ErrorLabel.textContent = "...";
+
     let Response = await RequestServer("POST", "register", {}, JSON.stringify(data));
     let Status = Response.Status;
-    let ErrorLabel = document.getElementById("Error Label");
 
     if(Status === 200 && ErrorLabel){
 
       ErrorLabel.textContent = "Registrazione consentita";
-
       window.location.href = '/login';
     }
 
     else if(Status === 400 && ErrorLabel) ErrorLabel.textContent = "I dati non sono stati passati nel modo corretto";
     else if(Status === 403 && ErrorLabel) ErrorLabel.textContent = "Questo account esiste già";
     else if(Status === 500 && ErrorLabel) ErrorLabel.textContent = "Il server sta avendo problemi interni di funzionamento";
+    else if(Status === null && ErrorLabel) ErrorLabel.textContent = "Il server non risponde";
 
   };
 

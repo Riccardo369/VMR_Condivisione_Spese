@@ -4,6 +4,8 @@ import storage from '../SharedAreaVariables';
 
 const EliminaAccount: React.FC = () => {
 
+  const ErrorLabel = document.getElementById("Error Label");
+
   const DeleteAccount = async () => {
 
     const data = {
@@ -16,7 +18,8 @@ const EliminaAccount: React.FC = () => {
 
     console.log("JWT passato: "+headers["authorization"]);
 
-    const ErrorLabel = document.getElementById("Error Label");
+    let ErrorLabel = document.getElementById("Error Label");
+    if(ErrorLabel) ErrorLabel.textContent = "...";
 
     const Status = (await RequestServer("DELETE", "account", headers, JSON.stringify(data))).Status;
 
@@ -31,10 +34,11 @@ const EliminaAccount: React.FC = () => {
 
     }
 
-    if(Status === 400 && ErrorLabel) ErrorLabel.textContent = "I dati non sono passati nel modo corretto";
-    if(Status === 401 && ErrorLabel) ErrorLabel.textContent = "Password non corretta";
-    if(Status === 401 && ErrorLabel) ErrorLabel.textContent = "JWT o password non validi";
-    if(Status === 500 && ErrorLabel) ErrorLabel.textContent = "Problema interno del server";
+    else if(Status === 400 && ErrorLabel)  ErrorLabel.textContent = "I dati non sono passati nel modo corretto";
+    else if(Status === 401 && ErrorLabel)  ErrorLabel.textContent = "Password non corretta";
+    else if(Status === 401 && ErrorLabel)  ErrorLabel.textContent = "JWT o password non validi";
+    else if(Status === 500 && ErrorLabel)  ErrorLabel.textContent = "Problema interno del server";
+    else if(Status === null && ErrorLabel) ErrorLabel.textContent = "Il server non risponde";
     
   };
 

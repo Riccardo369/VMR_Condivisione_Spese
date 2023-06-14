@@ -16,9 +16,11 @@ const MyComponent: React.FC = () => {
       "Password": (await CryptingText((document.getElementById("Password") as HTMLInputElement).value))
     };
 
+    let ErrorLabel = document.getElementById("Error Label");
+    if(ErrorLabel) ErrorLabel.textContent = "...";
+
     let Response = await RequestServer("POST", "login", {}, JSON.stringify(data));
     let Status = Response.Status;
-    let ErrorLabel = document.getElementById("Error Label");
 
     if(Status === 200 && ErrorLabel){
 
@@ -30,10 +32,11 @@ const MyComponent: React.FC = () => {
       window.location.href = '/PersonalArea';
     }
 
-    else if(Status === 400 && ErrorLabel) ErrorLabel.textContent = "I dati non sono stati passati nel modo corretto";
-    else if(Status === 401 && ErrorLabel) ErrorLabel.textContent = "Credenziali non valide";
-    else if(Status === 403 && ErrorLabel) ErrorLabel.textContent = "La tua richiesta è stata bloccata";
-    else if(Status === 500 && ErrorLabel) ErrorLabel.textContent = "Il server sta avendo problemi interni di funzionamento";
+    else if(Status === 400 && ErrorLabel)  ErrorLabel.textContent = "I dati non sono stati passati nel modo corretto";
+    else if(Status === 401 && ErrorLabel)  ErrorLabel.textContent = "Credenziali non valide";
+    else if(Status === 403 && ErrorLabel)  ErrorLabel.textContent = "La tua richiesta è stata bloccata";
+    else if(Status === 500 && ErrorLabel)  ErrorLabel.textContent = "Il server sta avendo problemi interni di funzionamento";
+    else if(Status === null && ErrorLabel) ErrorLabel.textContent = "Il server non risponde";
 
   };
 
