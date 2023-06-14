@@ -1,6 +1,6 @@
 # VMR_Condivisione_Spese
 
-'Progettazione/Database sep.sql'. File che contiene tutti i comandi necessari per creare il Database MySQL SEP, con le dovute tabelle e l' utente con i permessi adeguati
+'Progettazione/Database sep.sql'. File che contiene tutti i comandi necessari per creare il Database MySQL SEP, con le dovute tabelle e l' utente con i permessi adeguati. Il server si collega autenticandosi con quell' utente per accedere ai dati.
 
 
 'Back-end/Scripts/Server.js'. File da attivare in node js per il back-end
