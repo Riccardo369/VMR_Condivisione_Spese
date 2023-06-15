@@ -246,17 +246,19 @@ fastify.route({
 
     else{
 
-      //Modifico il SALT e riaggiorno la password
+      //Modifico il SALT e riaggiorno la password (Sezione commentata poichè si ha dei dubbi sulla sicurezza)
 
       //Creo un nuovo SALT
-      let Salt = await CryptingSecurity.GetSALT(20);
-      let NewPassword = await CryptingSecurity.CryptingText(OldPassword + Salt);
+      //let Salt = await CryptingSecurity.GetSALT(20);
 
-      //Creo la nuova password da mettere nel database
-      let Response = await DB.GetQuery("update Account set Password = ? where Nickname = ?", [NewPassword, Nickname]);
+      //Creo la nuova password
+      //let NewPassword = await CryptingSecurity.CryptingText(OldPassword + Salt);
+
+      //Metto la nuova password nel DB
+      //let Response = await DB.GetQuery("update Account set Password = ? where Nickname = ?", [NewPassword, Nickname]);
 
       //Nel caso in cui il DB si sia chiuso in questo istante, non riaggiorno il SALT
-      if(Response !== undefined) await ManagementSALT.AddSALT(Nickname, Salt);
+      //if(Response !== undefined) await ManagementSALT.AddSALT(Nickname, Salt);
 
       //Creo il nuovo token
       let TokenJWT = await StoreJWT.AddJWT(Nickname);
